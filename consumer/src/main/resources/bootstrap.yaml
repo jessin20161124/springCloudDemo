@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 101.43.195.208:8848
+        file-extension: properties
+  application:
+    name: spring-cloud-consumer
