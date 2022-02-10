@@ -1,2 +1,8 @@
 server:
   port: 9998
+spring:
+  mvc:
+    servlet:
+      path: /practice
+      loadOnStartup: 1
+    throw-exception-if-no-handler-found: true

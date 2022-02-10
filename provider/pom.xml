@@ -12,4 +12,10 @@
 	<name>provider</name>
 	<description>Demo project for Spring Cloud</description>
 
+	<dependencies>
+		<dependency>
+			<artifactId>api</artifactId>
+			<groupId>com.jessin.practice.spring.cloud</groupId>
+		</dependency>
+	</dependencies>
 </project>

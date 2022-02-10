@@ -8,4 +8,4 @@ spring:
         server-addr: 101.43.195.208:8848
 
   application:
-    name: spring-cloud-consumer
+    name: spring-cloud-provider
