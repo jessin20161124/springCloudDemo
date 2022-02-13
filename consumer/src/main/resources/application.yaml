@@ -6,3 +6,10 @@ spring:
       path: /practice
       loadOnStartup: 1
     throw-exception-if-no-handler-found: true
+logging:
+  file.max-history: 10
+  file.max-size: 1GB
+  pattern:
+    #日志格式，分别是文件的日志格式和控制台的日志格式
+    file: "%d{ISO8601} [%-5level] [%thread] |%L|%-40.40logger{0}|QTraceID[%X{qtraceid}]|---%msg%n"
+    console: "%d{ISO8601} [%-5level] [%thread] |%L|%-40.40logger{0}|QTraceID[%X{qtraceid}]|---%msg%n"
