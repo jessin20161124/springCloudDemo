@@ -20,6 +20,11 @@
 			<groupId>com.jessin.practice.spring.cloud</groupId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>hessian-lite</artifactId>
+			<version>3.2.12</version>
+		</dependency>
 	</dependencies>
 
 	<build>
