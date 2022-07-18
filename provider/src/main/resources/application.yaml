@@ -3,6 +3,7 @@ server:
 spring:
   mvc:
     servlet:
-      path: /practice
+      # 不能配置为/practice，否则健康检查不通过，服务发现不了 todo 看actuator url能不能隔离开来
+      path: /
       loadOnStartup: 1
     throw-exception-if-no-handler-found: true

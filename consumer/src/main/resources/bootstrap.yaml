@@ -6,8 +6,18 @@ spring:
          # dataId默认是${spring.application.name}.${file-extension}
         server-addr: 101.43.195.208:8848
         file-extension: properties
+        #如果使用nacos作为注册中心，则需要开启
+#      discovery:
+#        server-addr: 101.43.195.208:8848
+    consul:
       discovery:
-        server-addr: 101.43.195.208:8848
+        #注册到 Consul 的服务名称，后期客户端会根据这个名称来进行服务调用
+        serviceName: ${spring.application.name}
+        prefer-ip-address: true
+        ip-address: localhost
+      #consul注册中心地址
+      host: localhost
+      port: 8500
 
   application:
     name: spring-cloud-consumer

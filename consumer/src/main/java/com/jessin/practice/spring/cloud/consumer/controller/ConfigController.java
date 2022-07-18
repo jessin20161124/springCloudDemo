@@ -24,7 +24,7 @@ public class ConfigController {
     private UserServiceFeignClient userServiceFeignClient;
 
     /**
-     * http://localhost:9998/practice/getUseLocalCache
+     * http://localhost:9991/getUseLocalCache
      *
      * 修改值：
      *
@@ -38,7 +38,7 @@ public class ConfigController {
     }
 
     /**
-     * http://localhost:9998/practice/getKey
+     * http://localhost:9991/getKey
      *
      * 修改值：
      *
@@ -53,13 +53,13 @@ public class ConfigController {
     }
 
     /**
-     * http://localhost:9998/practice/getUserByName?name=xiaoming
+     * http://localhost:9991/getUserByName?name=xiaoming
      * @param name
      * @return
      */
     @RequestMapping("/getUserByName")
     public User getUserByName(String name) {
-        log.info("name is {}", name);
+        log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
         return userServiceFeignClient.getByName(name);
     }
 }

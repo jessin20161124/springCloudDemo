@@ -27,6 +27,7 @@
 		</dependency>
 	</dependencies>
 
+	<!-- 不能配置在父parent pom，否则会造成api 也按照maven plugin repackage-->
 	<build>
 		<plugins>
 			<plugin>

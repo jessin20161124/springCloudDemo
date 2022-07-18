@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * nacos跟spring cloud集成的话，配置文件在bootstrap.yaml，会自动注入到environment中，
  * 因而可以使用@Value，spring cloud才有RefreshScope，表示可以动态刷新，会重新构建environment
  * aa @Value 的方式dataId默认拉取的配置文件名为spring.application.name.{file.extension}，或者默认有共同前缀的spring.application.name，从而拉取多个配置文件
- * 所以spring cloud是一套微服务解决方案，很多都封装好了，需要大家去适配它，考虑通用性，有时就不太灵活
+ * 所以spring cloud是一套微服务解决方案，依赖非常多，很多都封装好了，需要大家去适配它，而不是自己去做，考虑通用性和个性化，有时就不太灵活
  * 而spring boot是自动化配置而已，简化配置，更方便使用，但是功能还是和原生的一样
  *
  * spring cloud貌似没有提供configListener的解决方案？todo 还是说监听refresh event?

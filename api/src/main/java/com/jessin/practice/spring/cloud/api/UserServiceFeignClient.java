@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("spring-cloud-provider")
 public interface UserServiceFeignClient {
 
-    @RequestMapping("/practice/getByName")
+    @RequestMapping("/getByName")
     User getByName(@RequestParam String name);
 }
