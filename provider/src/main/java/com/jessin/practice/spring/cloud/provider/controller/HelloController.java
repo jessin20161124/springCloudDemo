@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  *
  * @Author: jessin
@@ -17,6 +19,7 @@ public class HelloController implements UserServiceFeignClient {
 
     /**
      * http://localhost:9999/getByName?name=xiaoming
+     * 注意，注解均需要再写一遍
      * @param name
      * @return
      */
@@ -28,5 +31,25 @@ public class HelloController implements UserServiceFeignClient {
         user.setName(name);
         user.setAge(18);
         return user;
+    }
+
+    @RequestMapping("/timeout")
+    @Override
+    public User timeout(long timeout) {
+        log.info("provider 实现，超时:{}", timeout);
+
+        try {
+            TimeUnit.SECONDS.sleep(timeout);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @RequestMapping("/fail")
+    @Override
+    public User fail(String name) {
+        log.info("provider 实现，fail:{}", name);
+        throw new RuntimeException("fail");
     }
 }

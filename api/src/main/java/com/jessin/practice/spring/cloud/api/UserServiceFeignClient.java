@@ -14,4 +14,11 @@ public interface UserServiceFeignClient {
 
     @RequestMapping("/getByName")
     User getByName(@RequestParam String name);
+
+    @RequestMapping("/timeout")
+    User timeout(@RequestParam long timeout);
+
+    @RequestMapping("/fail")
+    User fail(@RequestParam String name);
+
 }

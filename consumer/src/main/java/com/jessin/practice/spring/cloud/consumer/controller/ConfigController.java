@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.TreeSet;
+
 /**
  *
  * @Author: jessin
@@ -42,7 +44,7 @@ public class ConfigController {
      *
      * 修改值：
      *
-     * curl -X POST "http://101.43.195.208:8848/nacos/v1/cs/configs?dataId=spring-cloud-consumer.properties&group=DEFAULT_GROUP&content=useLocalCache=true"
+     * curl -X POST "http://101.43.195.208:8848/nacos/v1/cs/configs?dataId=spring-cloud-consumer.properties&group=DEFAULT_GROUP&content=myKey=123"
      *
      * @return
      */
@@ -62,4 +64,27 @@ public class ConfigController {
         log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
         return userServiceFeignClient.getByName(name);
     }
+
+    /**
+     * http://localhost:9991/timeout?timeout=3
+     * @param timeout
+     * @return
+     */
+    @RequestMapping("/timeout")
+    public User timeout(long timeout) {
+        log.info("timeout: {}", timeout);
+        return userServiceFeignClient.timeout(timeout);
+    }
+
+    /**
+     * http://localhost:9991/fail?name=xiaoming
+     * @param name
+     * @return
+     */
+    @RequestMapping("/fail")
+    public User fail(String name) {
+        log.info("fail name: {}", name);
+        return userServiceFeignClient.fail(name);
+    }
+
 }
