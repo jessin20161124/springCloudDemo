@@ -8,3 +8,6 @@ logs/
 mvnw
 mvnw.cmd
 HELP.md
+
+.flattened-pom.xml
+**/.flattened-pom.xml

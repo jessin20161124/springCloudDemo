@@ -14,7 +14,7 @@
     <groupId>com.jessin.practice.spring.cloud</groupId>
     <artifactId>demo</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>springCloudDemo</name>
     <description>Demo project for Spring Cloud</description>
     <modules>
@@ -31,6 +31,8 @@
         <spring.cloud.version>Greenwich.SR6</spring.cloud.version>
         <spring.cloud.alibaba.version>2.1.4.RELEASE</spring.cloud.alibaba.version>
         <nacos.version>0.9.0.RELEASE</nacos.version>
+        <revision>0.0.1-SNAPSHOT</revision>
+        <maven_flatten_version>1.2.5</maven_flatten_version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -52,7 +54,7 @@
             <dependency>
                 <artifactId>api</artifactId>
                 <groupId>com.jessin.practice.spring.cloud</groupId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -125,5 +127,36 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- 保证子pom中的revision变量能替换成功 -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${maven_flatten_version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
