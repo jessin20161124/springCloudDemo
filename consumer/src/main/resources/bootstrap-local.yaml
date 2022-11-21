@@ -9,8 +9,15 @@ spring:
         #如果使用nacos作为注册中心，则需要开启
 #      discovery:
 #        server-addr: 101.43.195.208:8848
-  application:
-    name: spring-cloud-consumer
+    consul:
+      discovery:
+        #注册到 Consul 的服务名称，后期客户端会根据这个名称来进行服务调用
+        serviceName: ${spring.application.name}
+        prefer-ip-address: true
+        ip-address: localhost
+      #consul注册中心地址
+      host: localhost
+      port: 8500
 
 #全局
 ribbon:

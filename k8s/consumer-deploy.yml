@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: consumer
+  name: consumer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+        - image: spring-cloud-consumer-demo:0.0.1
+          name: spring-cloud-consumer-demo
+          ports:
+            - containerPort: 9991
+          env:
+            - name: consulIp
+              #替换为consul cluster ip
+              value: 10.98.83.145
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP

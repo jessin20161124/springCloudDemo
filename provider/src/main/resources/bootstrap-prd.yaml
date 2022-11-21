@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 101.43.195.208:8848
+        file-extension: properties
+#      discovery:
+#        server-addr: 101.43.195.208:8848
+    consul:
+      discovery:
+        #注册到 Consul 的服务名称，后期客户端会根据这个名称来进行服务调用
+        serviceName: ${spring.application.name}
+        hostname: ${HOST_IP}
+        instance-id: ${HOSTNAME}-${spring.application.instance_id:${random.value}}
+      #consul注册中心地址
+      host: ${consulIp}
+      port: 8500

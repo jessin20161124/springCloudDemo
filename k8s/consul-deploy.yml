@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: consul
+  name: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      containers:
+        - image: consul:latest
+          name: consul
+          ports:
+            - containerPort: 8500
+              name: ui-port
+            - containerPort: 8400
+              name: alt-port
+            - containerPort: 53
+              name: udp-port
+            - containerPort: 8443
+              name: https-port
+            - containerPort: 8080
+              name: http-port
+            - containerPort: 8301
+              name: serflan
+            - containerPort: 8302
+              name: serfwan
+            - containerPort: 8600
+              name: consuldns
+            - containerPort: 8300
+              name: server
+# 注意，地址不要加引号，-client绑定所有的地址，而不是127.0.0.1
+          # 这里如果重新部署的话，由于部署的pod可能发生变化，所以会丢失consul数据，合理的方法应该是使用stateful set。
+          # consul详细参数：https://baijiahao.baidu.com/s?id=1716030679838329699&wfr=spider&for=pc
+          args: ["agent", "-server", "-bootstrap", "-ui", "-node=1", "-client=0.0.0.0"]
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
