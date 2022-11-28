@@ -31,9 +31,9 @@ ARG LOG_DIR=/data/logs/provider
 
 RUN mkdir -pv ${LOG_DIR}
 
-ENV dbIp=101.43.195.208
-ENV dbUser=dada
-ENV dbUserPassword=laosijI_122
+#ENV dbIp=101.43.195.208
+#ENV dbUser=dada
+#ENV dbUserPassword=dsssa
 
 EXPOSE 9999
 

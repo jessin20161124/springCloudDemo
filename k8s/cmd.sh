@@ -13,6 +13,12 @@ kubectl apply -f k8s/consul-service.yml
 #获取consul cluster ip
 kubectl get service consul
 
+#启动mysql
+kubectl apply -f k8s/mysql-deplyment.yml
+kubectl apply -f k8s/mysql-service.yml
+
+#初始化数据库init.sql
+
 #先删除
 kubectl delete deployment provider
 #部署provider
@@ -25,8 +31,14 @@ kubectl get pods
 #部署consumer
 kubectl apply -f k8s/consumer-deploy.yml
 
-#部署provider service
+#部署consumer service
 kubectl apply -f k8s/consumer-service.yml
 
 #通过端口访问consumer service
 #http://localhost:30001/timeout?timeout=3
+
+#应用ingress controller定义文件，创建nginx-ingress-controller和ingress-service，底层会创建nginx
+kubectl apply -f k8s/ingress-nginx-controller.yml
+#创建ingress-http代理规则，把规则更新到controller的nginx
+kubectl apply -f k8s/ingress-http.yml
+

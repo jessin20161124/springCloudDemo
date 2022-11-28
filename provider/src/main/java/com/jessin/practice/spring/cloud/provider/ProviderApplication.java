@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  * maven父子模块统一版本：
  * https://blog.csdn.net/ZYC88888/article/details/112842029
- * flattenk可以对发布方的pom进行精简和变量替换
+ * flatten可以对发布方的pom进行精简和变量替换
  */
 @SpringBootApplication
 public class ProviderApplication {

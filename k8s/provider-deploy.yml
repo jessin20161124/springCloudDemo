@@ -5,7 +5,13 @@ metadata:
     app: provider
   name: provider
 spec:
-  replicas: 3
+  strategy:
+    rollingUpdate:
+      #最大峰值，用来指定可以创建的超出期望 Pod 个数的 Pod 数量。
+      maxSurge: 1
+      #最大不可用，用来指定更新过程中不可用的 Pod 的个数上限。
+      maxUnavailable: 1
+  replicas: 2
   selector:
     matchLabels:
       app: provider
@@ -15,10 +21,28 @@ spec:
         app: provider
     spec:
       containers:
-        - image: spring-cloud-provider-demo:0.0.1
+        - image: spring-cloud-provider-demo:0.0.3
           name: spring-cloud-provider-demo
           ports:
             - containerPort: 9999
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9999
+            initialDelaySeconds: 600
+            periodSeconds: 10
+            #探测的超时后等待多少秒。默认值是 1 秒
+            timeoutSeconds: 3
+#          readinessProbe:
+#            httpGet:
+#              path: /getKey
+#              port: 9999
+#            initialDelaySeconds: 180
+#            periodSeconds: 10
+#            #探测的超时后等待多少秒。默认值是 1 秒
+#            timeoutSeconds: 3
+#            #探测器在失败后，被视为成功的最小连续成功数。默认值是 1。 存活和启动探测的这个值必须是 1。最小值是 1。
+#            successThreshold: 1
           env:
             - name: consulIp
               #替换为consul cluster ip
@@ -27,4 +51,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-
+                  #todo consul ip /db ip走服务发现。
+                  #todo consul/db状态存错，skywalking等使用
+                  #使用cluster ip
+            - name: DBIP
+              value: 10.101.41.154
+            - name: DBUSER
+              value: ruby
+            - name: dbUserPassword
+              value: bingge_Pa1

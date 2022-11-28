@@ -30,9 +30,9 @@ ARG LOG_DIR=/data/logs/consumer
 
 RUN mkdir -pv ${LOG_DIR}
 
-ENV dbIp=101.43.195.208
-ENV dbUser=dada
-ENV dbUserPassword=laosijI_122
+#ENV dbIp=101.43.195.208
+#ENV dbUser=dada
+#ENV dbUserPassword=kkk
 
 EXPOSE 9991
 

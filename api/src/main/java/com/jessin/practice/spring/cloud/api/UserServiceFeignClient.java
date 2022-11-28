@@ -2,8 +2,11 @@ package com.jessin.practice.spring.cloud.api;
 
 import com.jessin.practice.spring.cloud.api.model.User;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @Author: jessin
@@ -12,8 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("spring-cloud-provider")
 public interface UserServiceFeignClient {
 
-    @RequestMapping("/getByName")
-    User getByName(@RequestParam String name);
+    @RequestMapping("/queryUser")
+    List<User> queryUser(@RequestBody UserQueryCondition userQueryCondition);
+
+    @RequestMapping("/insertUser")
+    User insertUser(@RequestBody User user);
 
     @RequestMapping("/timeout")
     User timeout(@RequestParam long timeout);

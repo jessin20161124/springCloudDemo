@@ -5,7 +5,13 @@ metadata:
     app: consumer
   name: consumer
 spec:
-  replicas: 3
+  strategy:
+    rollingUpdate:
+      #最大峰值，用来指定可以创建的超出期望 Pod 个数的 Pod 数量。
+      maxSurge: 1
+      #最大不可用，用来指定更新过程中不可用的 Pod 的个数上限。
+      maxUnavailable: 1
+  replicas: 2
   selector:
     matchLabels:
       app: consumer
@@ -15,10 +21,29 @@ spec:
         app: consumer
     spec:
       containers:
-        - image: spring-cloud-consumer-demo:0.0.1
+        - image: spring-cloud-consumer-demo:0.0.5
           name: spring-cloud-consumer-demo
           ports:
             - containerPort: 9991
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9991
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            #探测的超时后等待多少秒。默认值是 1 秒
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /getKey
+              port: 9991
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            #探测的超时后等待多少秒。默认值是 1 秒
+            timeoutSeconds: 3
+            #探测器在失败后，被视为成功的最小连续成功数。默认值是 1。 存活和启动探测的这个值必须是 1。最小值是 1。
+            successThreshold: 1
+            #failureThreshold：当探测失败时，Kubernetes 的重试次数，超过则认为失败，需要执行重启或者打标签。 对存活探测而言，放弃就意味着重新启动容器。 对就绪探测而言，放弃意味着 Pod 会被打上未就绪的标签。默认值是 3。最小值是 1。
           env:
             - name: consulIp
               #替换为consul cluster ip

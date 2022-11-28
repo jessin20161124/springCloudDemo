@@ -1,14 +1,15 @@
 package com.jessin.practice.spring.cloud.consumer.controller;
 
+import com.jessin.practice.spring.cloud.api.UserQueryCondition;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
 import com.jessin.practice.spring.cloud.api.model.User;
 import com.jessin.practice.spring.cloud.consumer.service.NacosCloudService;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.TreeSet;
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  *
@@ -60,10 +61,24 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/getUserByName")
-    public User getUserByName(String name) {
+    public List<User> getUserByName(String name) {
         log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
-        return userServiceFeignClient.getByName(name);
+        UserQueryCondition userQueryCondition = new UserQueryCondition();
+        userQueryCondition.setName(name);
+        return userServiceFeignClient.queryUser(userQueryCondition);
     }
+
+    /**
+     * http://localhost:9991/insertUser?name=jessin&age=1&sex=1&note=test
+     * @param user
+     * @return
+     */
+    @RequestMapping("/insertUser")
+    public User insertUser(User user) {
+        log.info("insert user:{}", user);
+        return userServiceFeignClient.insertUser(user);
+    }
+
 
     /**
      * http://localhost:9991/timeout?timeout=3

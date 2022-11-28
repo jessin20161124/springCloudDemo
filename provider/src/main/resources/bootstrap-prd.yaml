@@ -1,3 +1,9 @@
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /data/logs/provider/
+
 spring:
   cloud:
     nacos:
