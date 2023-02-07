@@ -12,6 +12,49 @@ spring:
   application:
     name: spring-cloud-consumer
 
+#------------------------------feignClient连接池------------------------------
+feign:
+  httpclient:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+      response: true
+      # 必须配置，才能启动hystrix，默认是groupkey=serviceId，commandKey=类名+方法名+参数，所以资源隔离程度是每个微服务会启动一个线程池
+      # 但是统计的粒度是commandKey，所以某个接口有问题，熔断了，不影响其他接口的使用！
+  hystrix:
+    enabled: true
+
+## hystrix不配置的话则使用默认值，默认超时时间为1s，10s内至少有20个请求，且50%失败了，则会开启熔断器
+## 5s后再次尝试关闭熔断器，5s期间一直是短路状态，默认10个线程
+## 默认使用 Archaius 配置：https://github.com/Netflix/Hystrix/wiki/Configuration
+## 全局熔断配置
+hystrix:
+  command:
+    # default -> 全局配置，serviceId -> 个性化配置
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 1000
+      # 断路器的三个参数，默认滑动窗口为10s，滑动窗口内有2次请求且错误率>50%，包括exception/timeout/reject
+      # 则直接降级，三秒后尝试关闭断路器
+      circuitBreaker:
+        requestVolumeThreshold: 2
+        errorThresholdPercentage: 50
+        sleepWindowInMilliseconds: 30000
+
+  threadpool:
+    default:
+      coreSize: 32
+      maximumSize: 64
+      maxQueueSize: 128
+      allowMaximumSizeToDrivergeFromCoreSize: true
+      queueSizeRejectionThreshold: 128
+
 #全局
 ribbon:
   #每台重试一次，不包括第一次
@@ -25,3 +68,4 @@ ribbon:
   retryableStatusCodes: 404,405,406
   #所有异常都可以重试，否则只有get请求能重试
   OkToRetryOnAllOperations: true
+
