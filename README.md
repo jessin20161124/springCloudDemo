@@ -1,4 +1,5 @@
 ## spring cloud实践
+&nbsp;&nbsp;&nbsp;&nbsp;完成一线大厂常见功能脚手架
 
 ### 已完成功能列表
 - [x] 基于spring boot 2.1.7.RELEASE + spring cloud Greenwich.SR6进行实验，版本需要对应
@@ -8,10 +9,18 @@
 - [x] 使用ribbon进行负载均衡
 - [x] 实现nacos spring cloud配置变更方法回调
 - [x] 支持配置中心变更时refresh属性配置
-
+- [x] 支持使用redisson/分布式锁/redis等操作
+- [x] 封装feign HttpResult
+- [x] docker/k8s部署
+- [x] hystrix熔断，sentinel尝试
 
 ### TODO LIST
-- [ ] spring cloud gateway集成，谓词测试
+- [ ] spring cloud gateway微服务网关集成，谓词测试，流程图补充
+- [ ] kafka集成
+- [ ] es集成
+- [ ] sharding-jdbc分库分表
+- [ ] 通用工具包封装，抽取几个子域公共代码，例如ExceptionHandler
+- [ ] ddd分层领域驱动设计，防腐层添加
 
 ### 博客参考
 [spring cloud实践](https://blog.csdn.net/ac_dao_di/article/details/126070583)
