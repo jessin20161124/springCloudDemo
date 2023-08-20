@@ -1,5 +1,6 @@
 package com.jessin.practice.spring.cloud.consumer.controller;
 
+import com.jessin.practice.spring.cloud.api.HttpResult;
 import com.jessin.practice.spring.cloud.api.UserQueryCondition;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
 import com.jessin.practice.spring.cloud.api.model.User;
@@ -61,7 +62,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/getUserByName")
-    public List<User> getUserByName(String name) {
+    public HttpResult<List<User>> getUserByName(String name) {
         log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
         UserQueryCondition userQueryCondition = new UserQueryCondition();
         userQueryCondition.setName(name);
@@ -74,7 +75,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/insertUser")
-    public User insertUser(User user) {
+    public HttpResult<User> insertUser(User user) {
         log.info("insert user:{}", user);
         return userServiceFeignClient.insertUser(user);
     }
@@ -86,7 +87,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/timeout")
-    public User timeout(long timeout) {
+    public HttpResult<User> timeout(long timeout) {
         log.info("timeout: {}", timeout);
         return userServiceFeignClient.timeout(timeout);
     }
@@ -97,7 +98,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/fail")
-    public User fail(String name) {
+    public HttpResult<User> fail(String name) {
         log.info("fail name: {}", name);
         return userServiceFeignClient.fail(name);
     }

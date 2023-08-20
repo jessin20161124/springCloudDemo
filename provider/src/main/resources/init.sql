@@ -1,6 +1,6 @@
 -- root密码默认为123456
-create database if not exists spring DEFAULT CHARACTER SET utf8mb4 ;
-use spring;
+create database if not exists spring_cloud DEFAULT CHARACTER SET utf8mb4 ;
+use spring_cloud;
 
 create table if not exists tb_user  (
  id bigint auto_increment ,
@@ -13,8 +13,8 @@ create table if not exists tb_user  (
  primary key(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE USER 'ruby'@'%' IDENTIFIED BY 'bingge_Pa1';
+CREATE USER 'hell'@'%' IDENTIFIED BY 'hackPmq_Pa1';
 
-GRANT insert,delete,update,select ON spring.* TO 'ruby'@'%';
+GRANT insert,delete,update,select ON spring_cloud.* TO 'hell'@'%';
 
 flush privileges;

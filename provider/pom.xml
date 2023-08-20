@@ -32,6 +32,11 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		<!-- 以后使用redisson作为所有分布式锁，分布式对象等功能框架-->
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+		</dependency>
 
 	</dependencies>
 

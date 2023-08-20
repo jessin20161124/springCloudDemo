@@ -1,0 +1,35 @@
+
+spring:
+  cloud:
+    nacos:
+      config:
+         # nacos-spring-cloud配置方式，file-extension会添加到dataId中，
+         # dataId默认是${spring.application.name}.${file-extension}
+        server-addr: 101.43.195.208:8848
+        file-extension: properties
+        #如果使用nacos作为注册中心，则需要开启
+#      discovery:
+#        server-addr: 101.43.195.208:8848
+    consul:
+      discovery:
+        #注册到 Consul 的服务名称，后期客户端会根据这个名称来进行服务调用
+        serviceName: ${spring.application.name}
+        prefer-ip-address: true
+        ip-address: localhost
+      #consul注册中心地址
+      host: 101.43.195.208
+      port: 8500
+
+# 全局，可以到服务级别，不能到方法级别
+ribbon:
+  #每台重试一次，不包括第一次
+  MaxAutoRetries: 0
+  #重试2台机器，不包括第一台，总共重试(MaxAutoRetries + 1) * (MaxAutoRetriesNextServer + 1)
+  MaxAutoRetriesNextServer: 2
+  #每次http请求的超时时间
+  ReadTimeout: 2000
+  ConnectTimeout: 2000
+  #如果对方返回404，抛出异常，以允许重试
+  retryableStatusCodes: 404,405,406
+  #所有异常都可以重试，否则只有get请求能重试
+  OkToRetryOnAllOperations: true

@@ -1,5 +1,6 @@
 package com.jessin.practice.spring.cloud.provider.controller;
 
+import com.jessin.practice.spring.cloud.api.HttpResult;
 import com.jessin.practice.spring.cloud.api.UserQueryCondition;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
 import com.jessin.practice.spring.cloud.api.model.User;
@@ -33,11 +34,11 @@ public class UserServiceFeignClientImpl implements UserServiceFeignClient {
      */
     @RequestMapping("/queryUser")
     @Override
-    public List<User> queryUser(@RequestBody UserQueryCondition userQueryCondition) {
+    public HttpResult<List<User>> queryUser(@RequestBody UserQueryCondition userQueryCondition) {
         log.info("provider 实现，userQueryCondition is {}", userQueryCondition);
         List<User> userList = userService.queryUser(userQueryCondition);
         log.debug("查询userQueryCondition：{}，对应的用户为：{}", userQueryCondition, userList);
-        return userList;
+        return HttpResult.success(userList);
     }
 
     /**
@@ -46,15 +47,15 @@ public class UserServiceFeignClientImpl implements UserServiceFeignClient {
      * @return
      */
     @RequestMapping("/insertUser")
-    public User insertUser(@RequestBody User user) {
+    public HttpResult<User> insertUser(@RequestBody User user) {
         boolean result = userService.insert(user);
         log.info("插入用户：{}，结果为：{}", user, result);
-        return user;
+        return HttpResult.success(user);
     }
 
     @RequestMapping("/timeout")
     @Override
-    public User timeout(long timeout) {
+    public HttpResult<User> timeout(long timeout) {
         log.info("provider 实现，超时:{}", timeout);
 
         try {
@@ -62,12 +63,12 @@ public class UserServiceFeignClientImpl implements UserServiceFeignClient {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return HttpResult.success(null);
     }
 
     @RequestMapping("/fail")
     @Override
-    public User fail(String name) {
+    public HttpResult<User> fail(String name) {
         log.info("provider 实现，fail:{}", name);
         throw new RuntimeException("fail");
     }

@@ -9,22 +9,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
+ * todo 用HttpResult包一层，定义一下错误码
+ *
+ * todo 使用远程consul的话，服务心跳会失败，这里手动指定url
+ *
  * @Author: jessin
  * @Date: 2022/2/10 8:40 下午
  */
-@FeignClient("spring-cloud-provider")
+@FeignClient(name = "spring-cloud-provider", url = "http://localhost:9999")
 public interface UserServiceFeignClient {
 
     @RequestMapping("/queryUser")
-    List<User> queryUser(@RequestBody UserQueryCondition userQueryCondition);
+    HttpResult<List<User>> queryUser(@RequestBody UserQueryCondition userQueryCondition);
 
     @RequestMapping("/insertUser")
-    User insertUser(@RequestBody User user);
+    HttpResult<User> insertUser(@RequestBody User user);
 
     @RequestMapping("/timeout")
-    User timeout(@RequestParam long timeout);
+    HttpResult<User> timeout(@RequestParam long timeout);
 
     @RequestMapping("/fail")
-    User fail(@RequestParam String name);
+    HttpResult<User> fail(@RequestParam String name);
 
 }

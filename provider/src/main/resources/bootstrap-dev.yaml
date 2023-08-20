@@ -14,8 +14,13 @@ spring:
         ip-address: localhost
 
       #consul注册中心地址
-      host: localhost
+      host: 101.43.195.208
       port: 8500
 redisson:
-  host: localhost:6379
-  password:
+  host: 101.43.195.208:6379
+  password: ${redissonPassword}
+#server:
+#  tomcat:
+#    accesslog:
+#      enabled: true
+#      directory: //Users/jessin/Documents/Program/springCloudDemo/provider/logs
