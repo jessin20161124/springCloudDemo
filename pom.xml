@@ -139,6 +139,14 @@
 <!--            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>-->
 <!--        </dependency>-->
 
+        <!--
+            KafkaAutoConfiguration已经引进到spring-boot-autoconfigure中
+            其依赖的生效条件就是下面这个pom放到类路径下，这个版本必须>=服务端版本
+         -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
 
     </dependencies>
 

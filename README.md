@@ -1,5 +1,5 @@
 ## spring cloud实践
-&nbsp;&nbsp;&nbsp;&nbsp;完成一线大厂常见功能脚手架
+&nbsp;&nbsp;&nbsp;&nbsp;封装一线大厂常见功能脚手架
 
 ### 已完成功能列表
 - [x] 基于spring boot 2.1.7.RELEASE + spring cloud Greenwich.SR6进行实验，版本需要对应
@@ -13,10 +13,11 @@
 - [x] 封装feign HttpResult
 - [x] docker/k8s部署
 - [x] hystrix熔断，sentinel尝试
+- [x] spring-kafka集成
+
 
 ### TODO LIST
 - [ ] spring cloud gateway微服务网关集成，谓词测试，流程图补充
-- [ ] kafka集成
 - [ ] es集成
 - [ ] sharding-jdbc分库分表
 - [ ] 通用工具包封装，抽取几个子域公共代码，例如ExceptionHandler

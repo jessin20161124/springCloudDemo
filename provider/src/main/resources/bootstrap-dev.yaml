@@ -16,9 +16,18 @@ spring:
       #consul注册中心地址
       host: 101.43.195.208
       port: 8500
+  kafka:
+    bootstrap-servers: 101.43.195.208:9092
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: latest
+    listener:
+      ack-mode: manual
 redisson:
   host: 101.43.195.208:6379
   password: ${redissonPassword}
+
+
 #server:
 #  tomcat:
 #    accesslog:
