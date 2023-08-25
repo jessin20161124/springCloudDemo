@@ -1,4 +1,4 @@
-package com.jessin.practice.spring.cloud.api.model;
+package com.jessin.practice.spring.cloud.api.dto;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.util.Date;
  * @Date: 2022/2/10 8:40 下午
  */
 @Data
-public class User {
+public class UserDTO {
     private Long id;
 
     private String name;

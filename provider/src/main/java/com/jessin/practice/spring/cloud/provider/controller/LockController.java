@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Controller
 @Slf4j
-public class LockServiceImpl {
+public class LockController {
 
     @Resource
     private RedissonClient redissonClient;

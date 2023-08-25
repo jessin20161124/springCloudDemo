@@ -1,7 +1,7 @@
 package com.jessin.practice.spring.cloud.provider.service;
 
-import com.jessin.practice.spring.cloud.api.UserQueryCondition;
-import com.jessin.practice.spring.cloud.api.model.User;
+import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.UserDTO;
 import com.jessin.practice.spring.cloud.provider.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,13 @@ public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    public List<User> queryUser(UserQueryCondition userQueryCondition) {
-        List<User> userList = userMapper.queryUser(userQueryCondition);
-        log.info("查询userQueryCondition：{}，返回：{}", userQueryCondition, userList);
-        return userList;
+    public List<UserDTO> queryUser(UserQueryCondition userQueryCondition) {
+        List<UserDTO> userDTOList = userMapper.queryUser(userQueryCondition);
+        log.info("查询userQueryCondition：{}，返回：{}", userQueryCondition, userDTOList);
+        return userDTOList;
     }
 
-    public boolean insert(User user) {
-        return userMapper.insertSelective(user) == 1;
+    public boolean insert(UserDTO userDTO) {
+        return userMapper.insertSelective(userDTO) == 1;
     }
 }

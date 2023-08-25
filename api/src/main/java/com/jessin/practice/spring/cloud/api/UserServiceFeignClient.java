@@ -1,6 +1,7 @@
 package com.jessin.practice.spring.cloud.api;
 
-import com.jessin.practice.spring.cloud.api.model.User;
+import com.jessin.practice.spring.cloud.api.dto.UserDTO;
+import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,15 +21,20 @@ import java.util.List;
 public interface UserServiceFeignClient {
 
     @RequestMapping("/queryUser")
-    HttpResult<List<User>> queryUser(@RequestBody UserQueryCondition userQueryCondition);
+    HttpResult<List<UserDTO>> queryUser(@RequestBody UserQueryCondition userQueryCondition);
 
+    /**
+     * todo DTO可以拆分为req/resp
+     * @param userDTO
+     * @return
+     */
     @RequestMapping("/insertUser")
-    HttpResult<User> insertUser(@RequestBody User user);
+    HttpResult<UserDTO> insertUser(@RequestBody UserDTO userDTO);
 
     @RequestMapping("/timeout")
-    HttpResult<User> timeout(@RequestParam long timeout);
+    HttpResult<UserDTO> timeout(@RequestParam long timeout);
 
     @RequestMapping("/fail")
-    HttpResult<User> fail(@RequestParam String name);
+    HttpResult<UserDTO> fail(@RequestParam String name);
 
 }

@@ -21,6 +21,7 @@
         <module>provider</module>
         <module>consumer</module>
         <module>api</module>
+        <module>common</module>
     </modules>
     <properties>
         <!--
@@ -57,11 +58,27 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <artifactId>common</artifactId>
+                <groupId>com.jessin.practice.spring.cloud</groupId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- 以后使用redisson作为所有分布式锁，分布式对象等功能框架-->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>
                 <version>3.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+                <version>4.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>6.0.23.Final</version>
             </dependency>
 
         </dependencies>
@@ -147,6 +164,23 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- 保证@Valid生效 -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <!--        <dependency>-->
+<!--            <groupId>org.apache.shardingsphere</groupId>-->
+<!--            <artifactId>sharding-transaction-spring</artifactId>-->
+<!--            <version>4.1.1</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 

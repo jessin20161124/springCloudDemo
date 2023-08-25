@@ -22,11 +22,17 @@ spring:
   kafka:
     # kafka broker集群地址，不需要zk
     bootstrap-servers: 101.43.195.208:9092
+    producer:
+      acks: 1
     consumer:
       enable-auto-commit: false
       auto-offset-reset: latest
     listener:
       ack-mode: manual
+      # 启动的KafkaConsumer的并发个数，默认是1
+      concurrency: 2
+      # 支持批量消费
+      type: batch
 
 # 全局，可以到服务级别，不能到方法级别
 ribbon:

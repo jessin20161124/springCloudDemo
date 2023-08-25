@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!-- 格式化 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        <property name="autoDelimitKeywords" value="true"/>
+        <!--自动实现Serializable接口-->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!--        自定义标记删除插件 -->
+<!--        <plugin type=management.repository.config.DeletedPlugin">-->
+<!--            <property name="markDeleteKey" value="is_deleted"/>-->
+<!--        </plugin>-->
+
+        <!--注释-->
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+
+        <!--连接mysql-->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://101.43.195.208:3306/spring_cloud"
+                        userId="hell"
+                        password="hackPmq_Pa1">
+            <property name="useInformationSchema" value="true"/>
+            <property name="remarks" value="true"/>
+        </jdbcConnection>
+
+        <!--生成实体类存放位置-->
+        <javaModelGenerator targetPackage="com.jessin.practice.spring.cloud.provider.entity" targetProject="src/main/java">
+            <property name="enableSubPackages" value="false" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!--生成映射文件存放位置-->
+        <sqlMapGenerator targetPackage="mappers"  targetProject="src/main/resources">
+            <property name="enableSubPackages" value="false" />
+        </sqlMapGenerator>
+        <!--生成Dao类存放位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.jessin.practice.spring.cloud.provider.mapper"  targetProject="src/main/java">
+            <property name="enableSubPackages" value="false" />
+        </javaClientGenerator>
+
+
+        <!-- 生成的表 -->
+        <table tableName="tb_order" domainObjectName="OrderDO"
+               enableCountByExample="false" enableUpdateByExample="true" enableDeleteByExample="false"
+               enableSelectByExample="true" enableSelectByPrimaryKey="false" selectByExampleQueryId="false" enableUpdateByPrimaryKey="false">
+            <property name="useActualColumnNames" value="false" />
+            <property name="ignoreQualifiersAtRuntime" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+    </context>
+</generatorConfiguration>

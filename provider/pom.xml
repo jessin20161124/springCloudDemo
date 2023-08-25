@@ -17,6 +17,10 @@
 			<artifactId>api</artifactId>
 			<groupId>com.jessin.practice.spring.cloud</groupId>
 		</dependency>
+		<dependency>
+			<artifactId>common</artifactId>
+			<groupId>com.jessin.practice.spring.cloud</groupId>
+		</dependency>
 		<!--
     1.0.0版本无法扫描classpath:*Mapper.xml
     1.3.0可以，注入的是String[]，
@@ -54,7 +58,36 @@
 <!--					</excludes>-->
 <!--				</configuration>-->
 			</plugin>
+			<plugin>
+				<!--  mvn mybatis-generator:generate -->
+				<groupId>org.mybatis.generator</groupId>
+				<artifactId>mybatis-generator-maven-plugin</artifactId>
+				<version>1.3.7</version>
 
+				<configuration>
+					<!--  引入 MyBatis-Generator 的配置文件 -->
+					<configurationFile>./src/main/resources/generatorConfig.xml</configurationFile>
+					<!--  允许 MBG 将构建消息写入日志中  -->
+					<verbose>true</verbose>
+					<!--  再次运行 MBG 时，允许覆盖已生成的文件，但是不会覆盖 xml 文件  -->
+					<overwrite>true</overwrite>
+				</configuration>
+
+				<dependencies>
+					<!--  引入 mysql 的 JDBC 驱动，否则会报错找不到驱动  -->
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>8.0.17</version>
+					</dependency>
+<!--					<dependency>-->
+<!--						<artifactId>api</artifactId>-->
+<!--						<groupId>com.jessin.practice.spring.cloud</groupId>-->
+<!--						<version>0.0.1-SNAPSHOT</version>-->
+<!--					</dependency>-->
+
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 </project>

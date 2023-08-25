@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jessin.practice.spring.cloud.provider.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.api.model.User">
+    <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.api.dto.UserDTO">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="sex" jdbcType="TINYINT" property="sex"/>
@@ -19,7 +19,7 @@
         from tb_user
         where id = #{id,jdbcType=BIGINT}
     </select>
-    <select id="queryUser" parameterType="com.jessin.practice.spring.cloud.api.UserQueryCondition" resultMap="BaseResultMap">
+    <select id="queryUser" parameterType="com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_user
@@ -37,7 +37,7 @@
         delete from tb_user
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.jessin.practice.spring.cloud.api.model.User">
+    <insert id="insert" parameterType="com.jessin.practice.spring.cloud.api.dto.UserDTO">
         insert into tb_user (id, name,
         sex, age, note, create_time,
         last_modified_time)
@@ -45,7 +45,7 @@
         #{sex,jdbcType=TINYINT}, #{age,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
         #{lastModifiedTime,jdbcType=TIMESTAMP})
     </insert>
-    <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.api.model.User">
+    <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.api.dto.UserDTO">
         insert into tb_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -94,7 +94,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.jessin.practice.spring.cloud.api.model.User">
+    <update id="updateByPrimaryKeySelective" parameterType="com.jessin.practice.spring.cloud.api.dto.UserDTO">
         update tb_user
         <set>
             <if test="name != null">
@@ -118,7 +118,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.jessin.practice.spring.cloud.api.model.User">
+    <update id="updateByPrimaryKey" parameterType="com.jessin.practice.spring.cloud.api.dto.UserDTO">
         update tb_user
         set name = #{name,jdbcType=VARCHAR},
         sex = #{sex,jdbcType=TINYINT},

@@ -1,4 +1,4 @@
-package com.jessin.practice.spring.cloud.provider.config;
+package com.jessin.practice.spring.cloud.provider.redisson;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

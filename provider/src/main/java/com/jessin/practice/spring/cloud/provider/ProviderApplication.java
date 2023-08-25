@@ -1,5 +1,6 @@
 package com.jessin.practice.spring.cloud.provider;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * flatten可以对发布方的pom进行精简和变量替换
  */
 @SpringBootApplication
+@MapperScan(basePackages = "com.jessin.practice.spring.cloud.provider.mapper")
 public class ProviderApplication {
 
 	public static void main(String[] args) {

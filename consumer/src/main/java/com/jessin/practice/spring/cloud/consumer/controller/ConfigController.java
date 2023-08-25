@@ -1,9 +1,9 @@
 package com.jessin.practice.spring.cloud.consumer.controller;
 
 import com.jessin.practice.spring.cloud.api.HttpResult;
-import com.jessin.practice.spring.cloud.api.UserQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
-import com.jessin.practice.spring.cloud.api.model.User;
+import com.jessin.practice.spring.cloud.api.dto.UserDTO;
 import com.jessin.practice.spring.cloud.consumer.service.NacosCloudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,7 +62,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/getUserByName")
-    public HttpResult<List<User>> getUserByName(String name) {
+    public HttpResult<List<UserDTO>> getUserByName(String name) {
         log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
         UserQueryCondition userQueryCondition = new UserQueryCondition();
         userQueryCondition.setName(name);
@@ -71,13 +71,13 @@ public class ConfigController {
 
     /**
      * http://localhost:9991/insertUser?name=jessin&age=1&sex=1&note=test
-     * @param user
+     * @param userDTO
      * @return
      */
     @RequestMapping("/insertUser")
-    public HttpResult<User> insertUser(User user) {
-        log.info("insert user:{}", user);
-        return userServiceFeignClient.insertUser(user);
+    public HttpResult<UserDTO> insertUser(UserDTO userDTO) {
+        log.info("insert user:{}", userDTO);
+        return userServiceFeignClient.insertUser(userDTO);
     }
 
 
@@ -87,7 +87,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/timeout")
-    public HttpResult<User> timeout(long timeout) {
+    public HttpResult<UserDTO> timeout(long timeout) {
         log.info("timeout: {}", timeout);
         return userServiceFeignClient.timeout(timeout);
     }
@@ -98,7 +98,7 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/fail")
-    public HttpResult<User> fail(String name) {
+    public HttpResult<UserDTO> fail(String name) {
         log.info("fail name: {}", name);
         return userServiceFeignClient.fail(name);
     }
