@@ -8,6 +8,7 @@ spring:
       path: /
       loadOnStartup: 1
     throw-exception-if-no-handler-found: true
+    # 代码中已经配置了数据源，这里不生效了
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${dbIp}:3306/spring_cloud?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true

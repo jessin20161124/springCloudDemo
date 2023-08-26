@@ -14,6 +14,9 @@
         <property name="autoDelimitKeywords" value="true"/>
         <!--自动实现Serializable接口-->
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- 覆盖xml，而不是追加 -->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin" />
+
         <!--        自定义标记删除插件 -->
 <!--        <plugin type=management.repository.config.DeletedPlugin">-->
 <!--            <property name="markDeleteKey" value="is_deleted"/>-->
@@ -29,8 +32,8 @@
         <!--连接mysql-->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
                         connectionURL="jdbc:mysql://101.43.195.208:3306/spring_cloud"
-                        userId="hell"
-                        password="hackPmq_Pa1">
+                        userId="${userName}"
+                        password="${password}">
             <property name="useInformationSchema" value="true"/>
             <property name="remarks" value="true"/>
         </jdbcConnection>
