@@ -4,6 +4,8 @@
   <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.provider.entity.OrderDO">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="order_no" jdbcType="BIGINT" property="orderNo" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="cancel_reason" jdbcType="VARCHAR" property="cancelReason" />
     <result column="uid" jdbcType="BIGINT" property="uid" />
     <result column="store_id" jdbcType="BIGINT" property="storeId" />
     <result column="total_amount" jdbcType="DECIMAL" property="totalAmount" />
@@ -71,8 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, order_no, `uid`, store_id, total_amount, pay_amount, order_status, create_time, 
-    last_modified_time
+    id, order_no, remark, cancel_reason, `uid`, store_id, total_amount, pay_amount, order_status, 
+    create_time, last_modified_time
   </sql>
   <select id="selectByExample" parameterType="com.jessin.practice.spring.cloud.provider.entity.OrderDOExample" resultMap="BaseResultMap">
     select
@@ -97,12 +99,14 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into tb_order (order_no, `uid`, store_id, 
-      total_amount, pay_amount, order_status, 
-      create_time, last_modified_time)
-    values (#{orderNo,jdbcType=BIGINT}, #{uid,jdbcType=BIGINT}, #{storeId,jdbcType=BIGINT}, 
-      #{totalAmount,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL}, #{orderStatus,jdbcType=TINYINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{lastModifiedTime,jdbcType=TIMESTAMP})
+    insert into tb_order (order_no, remark, cancel_reason, 
+      `uid`, store_id, total_amount, 
+      pay_amount, order_status, create_time, 
+      last_modified_time)
+    values (#{orderNo,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}, #{cancelReason,jdbcType=VARCHAR}, 
+      #{uid,jdbcType=BIGINT}, #{storeId,jdbcType=BIGINT}, #{totalAmount,jdbcType=DECIMAL}, 
+      #{payAmount,jdbcType=DECIMAL}, #{orderStatus,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastModifiedTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.provider.entity.OrderDO">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -112,6 +116,12 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="orderNo != null">
         order_no,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="cancelReason != null">
+        cancel_reason,
       </if>
       <if test="uid != null">
         `uid`,
@@ -138,6 +148,12 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="orderNo != null">
         #{orderNo,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelReason != null">
+        #{cancelReason,jdbcType=VARCHAR},
       </if>
       <if test="uid != null">
         #{uid,jdbcType=BIGINT},
@@ -171,6 +187,12 @@
       <if test="record.orderNo != null">
         order_no = #{record.orderNo,jdbcType=BIGINT},
       </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cancelReason != null">
+        cancel_reason = #{record.cancelReason,jdbcType=VARCHAR},
+      </if>
       <if test="record.uid != null">
         `uid` = #{record.uid,jdbcType=BIGINT},
       </if>
@@ -201,6 +223,8 @@
     update tb_order
     set id = #{record.id,jdbcType=BIGINT},
       order_no = #{record.orderNo,jdbcType=BIGINT},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      cancel_reason = #{record.cancelReason,jdbcType=VARCHAR},
       `uid` = #{record.uid,jdbcType=BIGINT},
       store_id = #{record.storeId,jdbcType=BIGINT},
       total_amount = #{record.totalAmount,jdbcType=DECIMAL},

@@ -203,8 +203,15 @@ redisson:
   host: 101.43.195.208:6379
   password: ${redissonPassword}
 
-#server:
-#  tomcat:
-#    accesslog:
-#      enabled: true
-#      directory: /Users/jessin/Documents/Program/springCloudDemo/provider/logs
+elasticsearch:
+  host: 101.43.195.208
+  port: 9200
+  conn-timeout: 10000
+  socket-timeout: 10000
+  connection-request-timeout: 10000
+
+logging:
+  level:
+    root: info
+    # 打印es请求日志，具体可看org.elasticsearch.client.RequestLogger
+    tracer: trace

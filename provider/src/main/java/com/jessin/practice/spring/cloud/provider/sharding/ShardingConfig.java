@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * https://www.cnblogs.com/ityml/p/14970508.html
  * @see SpringBootConfiguration
  */
 @Configuration

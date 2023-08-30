@@ -59,6 +59,10 @@
 <!--				</configuration>-->
 			</plugin>
 			<plugin>
+				<!--
+				https://deecyn.gitee.io/notes/doc/javaweb/mybatis/mybatis-generator-config.html
+				https://juejin.cn/post/6844904116422983694
+				-->
 				<!--  mvn mybatis-generator:generate -DuserName=xxx -Dpassword=xxx -->
 				<groupId>org.mybatis.generator</groupId>
 				<artifactId>mybatis-generator-maven-plugin</artifactId>

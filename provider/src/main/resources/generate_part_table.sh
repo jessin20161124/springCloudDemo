@@ -1,12 +1,15 @@
 #!/bin/bash
 for dbNum in {0..31}; do
-        printf 'create database if not exists spring_cloud_%d DEFAULT CHARACTER SET utf8mb4 ;use spring_cloud_%d;\n' $dbNum $dbNum
+        printf 'drop database spring_cloud_%d;create database if not exists spring_cloud_%d DEFAULT CHARACTER SET utf8mb4 ;use spring_cloud_%d;\n' $dbNum $dbNum $dbNum
         # 注意，打印%，这里必须是%%，对%进行转义
         printf "GRANT insert,delete,update,select ON spring_cloud_%d.* TO 'hell'@'%%';flush privileges;\n" $dbNum
         for tableNum in {0..31}; do
                         printf "create table if not exists tb_order_%d  (
-                  id bigint auto_increment ,
+                  id bigint auto_increment comment '自增id',
+                  # todo order_no需要有唯一键，再增加个版本号？
                   order_no bigint not null comment '订单号',
+                  remark varchar(256) not null comment '备注',
+                  cancel_reason varchar(256) not null comment '取消原因',
                   uid bigint not null comment '用户id',
                   store_id bigint not null comment '店铺id',
                   total_amount decimal(10, 2) not null comment '总金额',

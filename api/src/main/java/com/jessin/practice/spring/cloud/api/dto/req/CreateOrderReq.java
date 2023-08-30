@@ -10,6 +10,10 @@ public class CreateOrderReq {
     @NotNull
     private Long storeId;
 
+    private String remark;
+
+    private String cancelReason;
+
     private List<GoodItem> goodsIdList;
 
     @Data

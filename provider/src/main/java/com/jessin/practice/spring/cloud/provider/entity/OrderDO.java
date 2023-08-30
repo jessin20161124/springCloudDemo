@@ -1,13 +1,23 @@
 package com.jessin.practice.spring.cloud.provider.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jessin.practice.spring.cloud.provider.es.EsDocument;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OrderDO implements Serializable {
+/**
+ * 是否针对es对象单独再搞个DO
+ */
+public class OrderDO implements Serializable, EsDocument {
     private Long id;
 
     private Long orderNo;
+
+    private String remark;
+
+    private String cancelReason;
 
     private Long uid;
 
@@ -22,6 +32,8 @@ public class OrderDO implements Serializable {
     private Date createTime;
 
     private Date lastModifiedTime;
+
+    private long version;
 
     private static final long serialVersionUID = 1L;
 
@@ -39,6 +51,22 @@ public class OrderDO implements Serializable {
 
     public void setOrderNo(Long orderNo) {
         this.orderNo = orderNo;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason == null ? null : cancelReason.trim();
     }
 
     public Long getUid() {
@@ -95,5 +123,26 @@ public class OrderDO implements Serializable {
 
     public void setLastModifiedTime(Date lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
+    }
+
+    /**
+     * 不持久化，仅内存临时使用
+     * @return
+     */
+    @JsonIgnore
+    @Override
+    public String getDocId() {
+        return String.valueOf(orderNo);
+    }
+
+    @JsonIgnore
+    @Override
+    public long getVersion() {
+        return version;
+    }
+
+    @Override
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

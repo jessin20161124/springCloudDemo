@@ -28,6 +28,7 @@ spring:
       enable-auto-commit: false
       auto-offset-reset: latest
     listener:
+      # 每次poll结束之后，下一次poll时，会将上一次的commitOffset，默认不配置的话是同步commitOffset
       ack-mode: manual
       # 启动的KafkaConsumer的并发个数，默认是1
       concurrency: 2

@@ -26,6 +26,7 @@ public class KafkaConsumer {
 //    public void listen(ConsumerRecord<String, String> record, String value, Acknowledgment ack) {
 //        log.info("input value: {}" , value);
 //        log.info("record key: {}, record value: {}" , record.key(), record.value());
+//        // 单条消费是先将offset放到内存中累积，下次poll时再提交，如果发生重启，可能重复消费，可以改为立马commitOffset
 //        ack.acknowledge();
 //    }
 
