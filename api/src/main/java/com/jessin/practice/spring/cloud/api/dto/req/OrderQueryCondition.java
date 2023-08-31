@@ -15,6 +15,11 @@ public class OrderQueryCondition {
     private String remark;
 
     /**
+     * 如果是scroll查询，只看这个参数
+     * todo 是否可以再抽取个scroll req？
+     */
+    private String scrollId;
+    /**
      * 备注模糊查询
      */
     private String remarkLike;

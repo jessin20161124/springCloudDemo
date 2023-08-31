@@ -1,8 +1,10 @@
 package com.jessin.practice.spring.cloud.provider.es;
 
 import com.google.common.collect.Lists;
+import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.common.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -11,15 +13,16 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.jessin.practice.spring.cloud.provider.constant.EsIndexConstants.DEFAULT_TYPE;
+
 /**
  * 新字段，无默认值
  * https://zhuanlan.zhihu.com/p/159138736
@@ -39,8 +44,6 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ElasticSearchServiceImpl implements ElasticSearchOperation {
-
-    private static final String DEFAULT_TYPE = "order";
 
     @Resource
     private RestHighLevelClient restHighLevelClient;
@@ -153,6 +156,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchOperation {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        log.info("总条数 {}", searchResponse.getHits().getTotalHits());
 //        log.info("返回值 {}", JsonUtils.write(searchResponse));
         List<T> res = Lists.newArrayList();
         for (SearchHit searchHit : searchResponse.getHits().getHits()) {
@@ -162,6 +166,92 @@ public class ElasticSearchServiceImpl implements ElasticSearchOperation {
         }
         return res;
     }
+
+    /**
+     * https://blog.csdn.net/m0_51491702/article/details/124686633
+     *
+     * scroll查询，一般不会一下子查询所有，查询所有的话内存很能会爆，而是通过前端分批几次往下查询，每个scroll请求有时间限制，不能太久
+     * 可以先查符合条件的条数，如果超过1万，则提示走scroll
+     *
+     * @param index
+     * @param searchSourceBuilder
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    @Override
+    public <T extends EsDocument> ScrollResult<List<T>> scrollDocument(String index, SearchSourceBuilder searchSourceBuilder, String scrollId, Class<T> clazz) {
+        SearchResponse searchResponse;
+        if (searchSourceBuilder != null) {
+            searchResponse = getfirstScrollSearchResponse(index, searchSourceBuilder);
+        } else {
+            searchResponse = getNextScrollSearchResponse(scrollId);
+        }
+        String retScrollId = searchResponse.getScrollId();
+//        log.info("返回值 {}", JsonUtils.write(searchResponse));
+        List<T> data = Lists.newArrayList();
+        for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+            T one = JsonUtils.read(searchHit.getSourceAsString(), clazz);
+            one.setVersion(searchHit.getVersion());
+            data.add(one);
+        }
+        if (CollectionUtils.isEmpty(data)) {
+            clearScroll(retScrollId);
+        }
+        log.info("总条数 {}", searchResponse.getHits().getTotalHits());
+        ScrollResult<List<T>> scrollResult = new ScrollResult<>();
+        scrollResult.setScrollId(retScrollId);
+        scrollResult.setData(data);
+        return scrollResult;
+    }
+
+    private SearchResponse getfirstScrollSearchResponse(String index, SearchSourceBuilder searchSourceBuilder) {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices(index);
+        searchRequest.source(searchSourceBuilder);
+        //设置查询超时时间
+        Scroll scroll = new Scroll(TimeValue.timeValueMinutes(5L));
+        searchRequest.scroll(scroll);
+        SearchResponse searchResponse;
+        try {
+            searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return searchResponse;
+    }
+
+    private SearchResponse getNextScrollSearchResponse(String scrollId) {
+        //构造滚动查询条件
+        SearchScrollRequest searchScrollRequest = new SearchScrollRequest(scrollId);
+        //设置查询超时时间
+        Scroll scroll = new Scroll(TimeValue.timeValueMinutes(5L));
+        searchScrollRequest.scroll(scroll);
+        SearchResponse searchResponse;
+        try {
+            //响应必须是上面的响应对象，需要对上一层进行覆盖
+            searchResponse = restHighLevelClient.scroll(searchScrollRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return searchResponse;
+    }
+
+    private boolean clearScroll(String scrollId) {
+        // 清除滚动，否则影响下次查询
+        ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+        clearScrollRequest.addScrollId(scrollId);
+        ClearScrollResponse clearScrollResponse = null;
+        try {
+            clearScrollResponse = restHighLevelClient.clearScroll(clearScrollRequest,RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error("滚动查询删除失败 ", e);
+        }
+        //清除滚动是否成功
+        boolean succeeded = clearScrollResponse.isSucceeded();
+        return succeeded;
+   }
 
     @Override
     public SearchResponse rawSearch(String index, SearchSourceBuilder searchSourceBuilder) {
@@ -176,6 +266,4 @@ public class ElasticSearchServiceImpl implements ElasticSearchOperation {
         }
         return searchResponse;
     }
-
-    // todo scroll查询
 }

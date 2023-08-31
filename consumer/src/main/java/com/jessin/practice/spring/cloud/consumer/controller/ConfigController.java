@@ -1,9 +1,9 @@
 package com.jessin.practice.spring.cloud.consumer.controller;
 
-import com.jessin.practice.spring.cloud.api.HttpResult;
+import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
 import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
-import com.jessin.practice.spring.cloud.api.dto.UserDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import com.jessin.practice.spring.cloud.consumer.service.NacosCloudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;

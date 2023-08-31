@@ -1,7 +1,7 @@
 package com.jessin.practice.spring.cloud.provider.mapper;
 
 import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
-import com.jessin.practice.spring.cloud.api.dto.UserDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

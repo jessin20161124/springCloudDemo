@@ -1,8 +1,8 @@
 package com.jessin.practice.spring.cloud.provider.controller;
 
-import com.jessin.practice.spring.cloud.api.HttpResult;
+import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
-import com.jessin.practice.spring.cloud.api.dto.UserDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
 import com.jessin.practice.spring.cloud.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;

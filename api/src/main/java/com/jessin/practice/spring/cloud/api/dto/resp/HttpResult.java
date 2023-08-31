@@ -1,4 +1,4 @@
-package com.jessin.practice.spring.cloud.api;
+package com.jessin.practice.spring.cloud.api.dto.resp;
 
 import lombok.Data;
 

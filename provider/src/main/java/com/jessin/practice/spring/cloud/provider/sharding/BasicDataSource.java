@@ -1,6 +1,7 @@
 package com.jessin.practice.spring.cloud.provider.sharding;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -11,6 +12,7 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 @AllArgsConstructor
+@Slf4j
 public class BasicDataSource implements DataSource {
     private String dbName;
     private DataSource instanceDataSource;
@@ -25,7 +27,9 @@ public class BasicDataSource implements DataSource {
     private void useDb(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
         // 那么如果是连接池，复用的话，这里不就有问题么？但是这里是连接池的上层，所以没问题？每次都会重新设置
-        statement.execute("use `" + dbName + "`;");
+        String use = "use `" + dbName + "`;";
+        statement.execute(use);
+        log.info(use);
         statement.close();
     }
 

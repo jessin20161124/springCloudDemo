@@ -203,6 +203,7 @@ redisson:
   host: 101.43.195.208:6379
   password: ${redissonPassword}
 
+# todo 设置密码
 elasticsearch:
   host: 101.43.195.208
   port: 9200
@@ -213,5 +214,5 @@ elasticsearch:
 logging:
   level:
     root: info
-    # 打印es请求日志，具体可看org.elasticsearch.client.RequestLogger
+    # 打印es curl请求日志，具体可看org.elasticsearch.client.RequestLogger
     tracer: trace

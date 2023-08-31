@@ -3,10 +3,12 @@ package com.jessin.practice.spring.cloud.provider.service;
 import com.google.common.base.Preconditions;
 import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
 import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.common.IdGenerator;
 import com.jessin.practice.spring.cloud.common.RandomIdGenerator;
 import com.jessin.practice.spring.cloud.provider.bo.OrderBO;
 import com.jessin.practice.spring.cloud.provider.bo.OrderStatisticBO;
+import com.jessin.practice.spring.cloud.provider.constant.EsIndexConstants;
 import com.jessin.practice.spring.cloud.provider.entity.OrderDO;
 import com.jessin.practice.spring.cloud.provider.entity.OrderDOExample;
 import com.jessin.practice.spring.cloud.provider.es.ElasticSearchOperation;
@@ -22,6 +24,7 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.sum.Sum;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -118,7 +121,7 @@ public class OrderService {
         boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
         Preconditions.checkArgument(ok, "创建订单失败");
         // todo 改成异步
-        elasticSearchOperation.createDocument("order_info", orderDO);
+        elasticSearchOperation.createDocument(EsIndexConstants.ORDER_INFO_INDEX, orderDO);
         return String.valueOf(orderDO.getOrderNo());
     }
 
@@ -164,12 +167,12 @@ public class OrderService {
      * @return
      */
     private boolean updateEsOrderStatus(String orderNo) {
-        OrderDO esOrder = elasticSearchOperation.getDocument("order_info", orderNo, OrderDO.class);
+        OrderDO esOrder = elasticSearchOperation.getDocument(EsIndexConstants.ORDER_INFO_INDEX, orderNo, OrderDO.class);
 
         Preconditions.checkNotNull(esOrder, "es订单不存在: " + orderNo);
         Preconditions.checkArgument(esOrder.getOrderStatus() == 0, "es订单状态非法: " + orderNo);
         esOrder.setOrderStatus((byte)1);
-        boolean ret = elasticSearchOperation.updateDocument("order_info", esOrder);
+        boolean ret = elasticSearchOperation.updateDocument(EsIndexConstants.ORDER_INFO_INDEX, esOrder);
         return ret;
     }
 
@@ -205,9 +208,9 @@ public class OrderService {
         sortBuilder.order(SortOrder.DESC);
         searchSourceBuilder.sort(sortBuilder);
 
-        // 默认不写，es只返回10条
+        // 默认不写，es只返回10条，默认from + size > 10000，es会报错。注意深分页问题
         if (orderQueryCondition.getPageNo() != null && orderQueryCondition.getPageSize() != null) {
-            // offset，todo 注意深分页问题
+            // offset
             searchSourceBuilder.from((orderQueryCondition.getPageNo() - 1) * orderQueryCondition.getPageSize());
             searchSourceBuilder.size(orderQueryCondition.getPageSize());
         }
@@ -215,7 +218,7 @@ public class OrderService {
 //        String[] retFields = new String[]{"orderNo", "uid"};
 //        String[] excludeFields = new String[]{};
 //        searchSourceBuilder.fetchSource(retFields, excludeFields);
-        List<OrderDO> list = elasticSearchOperation.searchDocument("order_info", searchSourceBuilder, OrderDO.class);
+        List<OrderDO> list = elasticSearchOperation.searchDocument(EsIndexConstants.ORDER_INFO_INDEX, searchSourceBuilder, OrderDO.class);
         return list.stream().map(orderDO -> {
             OrderBO orderBO = new OrderBO();
             BeanUtils.copyProperties(orderDO, orderBO);
@@ -223,10 +226,88 @@ public class OrderService {
         }).collect(Collectors.toList());
     }
 
+    public ScrollResult<List<OrderBO>> scrollOrder(OrderQueryCondition orderQueryCondition) {
+
+        SearchSourceBuilder searchSourceBuilder = null;
+
+        if (StringUtils.isBlank(orderQueryCondition.getScrollId())) {
+            searchSourceBuilder = new SearchSourceBuilder();
+            // todo nested查询
+            BoolQueryBuilder boolQueryBuilder = transform2BoolQueryBuilder(orderQueryCondition);
+
+            searchSourceBuilder.query(boolQueryBuilder);
+
+            // 按照创建时间降序
+            SortBuilder sortBuilder = new FieldSortBuilder("createTime");
+            sortBuilder.order(SortOrder.DESC);
+            searchSourceBuilder.sort(sortBuilder);
+
+            // 默认不写，es只返回10条，默认from + size > 10000，es会报错
+            if (orderQueryCondition.getPageNo() != null && orderQueryCondition.getPageSize() != null) {
+                // offset
+                searchSourceBuilder.from((orderQueryCondition.getPageNo() - 1) * orderQueryCondition.getPageSize());
+                searchSourceBuilder.size(orderQueryCondition.getPageSize());
+            }
+            // 只返回需要的字段，不指定的话返回所有
+//        String[] retFields = new String[]{"orderNo", "uid"};
+//        String[] excludeFields = new String[]{};
+//        searchSourceBuilder.fetchSource(retFields, excludeFields);
+        }
+
+        ScrollResult<List<OrderDO>> scrollResult = elasticSearchOperation.scrollDocument(EsIndexConstants.ORDER_INFO_INDEX, searchSourceBuilder, orderQueryCondition.getScrollId(), OrderDO.class);
+        List<OrderBO> list = scrollResult.getData().stream().map(orderDO -> {
+            OrderBO orderBO = new OrderBO();
+            BeanUtils.copyProperties(orderDO, orderBO);
+            return orderBO;
+        }).collect(Collectors.toList());
+        return ScrollResult.of(scrollResult.getScrollId(), list);
+    }
+
     /**
-     * es聚合
-     * 除了Aggregation数据，hit数据也会返回，todo 这部分可以去掉
+     *
+     * 查询符合条件的条数，不需要group by
+     *
+     * elasticsearch版本7.x如果查询的结果大于1w条，则在hit.total上的总数只是返回1w？
+     *
      * https://mp.weixin.qq.com/s/0h4qzSvhkKrLgLQh59dk7Q
+     *
+     * cardinality -> distinct
+     *
+     * 统计每个门店的订单个数和支付金额，例如今天的
+     select storeId, count(storeId), sum(payAmount) as totalPayAmount,max(payAmount)  as maxPayAmount
+     from order_info
+     where xxx group by storeId
+     *
+     * @param orderQueryCondition
+     * @return
+     */
+    public long countOrder(OrderQueryCondition orderQueryCondition) {
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        BoolQueryBuilder boolQueryBuilder = transform2BoolQueryBuilder(orderQueryCondition);
+        searchSourceBuilder.query(boolQueryBuilder);
+        // 不返回数据内容
+        searchSourceBuilder.size(0);
+        // terms/sum名词不重要，重要的是field
+        AggregationBuilder aggregationBuilder = AggregationBuilders.count("cnt").field("storeId");
+        // 可以有多个聚合
+        searchSourceBuilder.aggregation(aggregationBuilder);
+
+        SearchResponse searchResponse = elasticSearchOperation.rawSearch(EsIndexConstants.ORDER_INFO_INDEX, searchSourceBuilder);
+        Aggregations aggregations = searchResponse.getAggregations();
+        ValueCount byStoreIdAggregation = aggregations.get("cnt");
+        long cnt = byStoreIdAggregation.getValue();
+        log.info("count条数 {}", cnt);
+        return cnt;
+    }
+
+    /**
+     *
+     * es聚合
+     * https://mp.weixin.qq.com/s/0h4qzSvhkKrLgLQh59dk7Q
+     *
+     * cardinality -> distinct
      *
      * 统计每个门店的订单个数和支付金额，例如今天的
      select storeId, count(storeId), sum(payAmount) as totalPayAmount,max(payAmount)  as maxPayAmount
@@ -242,6 +323,8 @@ public class OrderService {
 
         BoolQueryBuilder boolQueryBuilder = transform2BoolQueryBuilder(orderQueryCondition);
         searchSourceBuilder.query(boolQueryBuilder);
+        // 不需要返回hit数据
+        searchSourceBuilder.size(0);
 
         // terms/sum名词不重要，重要的是field
         AggregationBuilder aggregationBuilder = AggregationBuilders.terms("byStoreId")
@@ -252,7 +335,7 @@ public class OrderService {
         searchSourceBuilder.aggregation(aggregationBuilder);
 
 
-        SearchResponse searchResponse = elasticSearchOperation.rawSearch("order_info", searchSourceBuilder);
+        SearchResponse searchResponse = elasticSearchOperation.rawSearch(EsIndexConstants.ORDER_INFO_INDEX, searchSourceBuilder);
         Aggregations aggregations = searchResponse.getAggregations();
         // 按照门店聚合的bucket
         Terms byStoreIdAggregation = aggregations.get("byStoreId");

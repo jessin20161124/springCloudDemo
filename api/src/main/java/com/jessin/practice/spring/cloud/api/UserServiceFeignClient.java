@@ -1,7 +1,8 @@
 package com.jessin.practice.spring.cloud.api;
 
-import com.jessin.practice.spring.cloud.api.dto.UserDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
