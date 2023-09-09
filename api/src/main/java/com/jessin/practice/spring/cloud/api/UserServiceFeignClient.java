@@ -1,7 +1,8 @@
 package com.jessin.practice.spring.cloud.api;
 
+import com.jessin.practice.spring.cloud.api.dto.resp.PageResult;
 import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
-import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.req.UserQueryReq;
 import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ import java.util.List;
 public interface UserServiceFeignClient {
 
     @RequestMapping("/queryUser")
-    HttpResult<List<UserDTO>> queryUser(@RequestBody UserQueryCondition userQueryCondition);
+    HttpResult<PageResult<List<UserDTO>>> queryUser(@RequestBody UserQueryReq userQueryCondition);
 
     /**
      * todo DTO可以拆分为req/resp

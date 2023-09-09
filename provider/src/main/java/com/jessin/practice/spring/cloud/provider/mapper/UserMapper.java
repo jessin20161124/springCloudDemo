@@ -1,8 +1,9 @@
 package com.jessin.practice.spring.cloud.provider.mapper;
 
-import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
-import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
+import com.jessin.practice.spring.cloud.provider.bo.UserQueryCondition;
+import com.jessin.practice.spring.cloud.provider.entity.UserDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,15 +16,15 @@ import java.util.List;
 public interface UserMapper {
     int deleteByPrimaryKey(Long id);
 
-    int insert(UserDTO record);
+    int insert(UserDO record);
 
-    int insertSelective(UserDTO record);
+    int insertSelective(UserDO record);
 
-    List<UserDTO> queryUser(UserQueryCondition userQueryCondition);
+    List<UserDO> queryUser(UserQueryCondition userQueryCondition);
 
-    UserDTO selectByPrimaryKey(Long id);
+    UserDO selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(UserDTO record);
+    int updateByConditionSelective(@Param("changeItem") UserDO record, @Param("condition") UserDO condition);
 
-    int updateByPrimaryKey(UserDTO record);
+    int updateByPrimaryKey(UserDO record);
 }

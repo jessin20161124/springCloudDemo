@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jessin.practice.spring.cloud.provider.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.api.dto.resp.UserDTO">
+    <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.provider.entity.UserDO">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="sex" jdbcType="TINYINT" property="sex"/>
@@ -19,7 +19,7 @@
         from tb_user
         where id = #{id,jdbcType=BIGINT}
     </select>
-    <select id="queryUser" parameterType="com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition" resultMap="BaseResultMap">
+    <select id="queryUser" parameterType="com.jessin.practice.spring.cloud.provider.bo.UserQueryCondition" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_user
@@ -37,7 +37,7 @@
         delete from tb_user
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.jessin.practice.spring.cloud.api.dto.resp.UserDTO">
+    <insert id="insert" parameterType="com.jessin.practice.spring.cloud.provider.entity.UserDO" useGeneratedKeys="true" keyProperty="id">
         insert into tb_user (id, name,
         sex, age, note, create_time,
         last_modified_time)
@@ -45,7 +45,7 @@
         #{sex,jdbcType=TINYINT}, #{age,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
         #{lastModifiedTime,jdbcType=TIMESTAMP})
     </insert>
-    <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.api.dto.resp.UserDTO">
+    <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.provider.entity.UserDO" useGeneratedKeys="true" keyProperty="id">
         insert into tb_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -94,31 +94,41 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.jessin.practice.spring.cloud.api.dto.resp.UserDTO">
+    <update id="updateByConditionSelective" parameterType="map">
         update tb_user
         <set>
-            <if test="name != null">
-                name = #{name,jdbcType=VARCHAR},
+            <if test="changeItem.name != null">
+                name = #{changeItem.name,jdbcType=VARCHAR},
             </if>
-            <if test="sex != null">
-                sex = #{sex,jdbcType=TINYINT},
+            <if test="changeItem.sex != null">
+                sex = #{changeItem.sex,jdbcType=TINYINT},
             </if>
-            <if test="age != null">
-                age = #{age,jdbcType=INTEGER},
+            <if test="changeItem.age != null">
+                age = #{changeItem.age,jdbcType=INTEGER},
             </if>
-            <if test="note != null">
-                note = #{note,jdbcType=VARCHAR},
+            <if test="changeItem.note != null">
+                note = #{changeItem.note,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
+            <if test="changeItem.createTime != null">
+                create_time = #{changeItem.createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="lastModifiedTime != null">
-                last_modified_time = #{lastModifiedTime,jdbcType=TIMESTAMP},
+            <if test="changeItem.lastModifiedTime != null">
+                last_modified_time = #{changeItem.lastModifiedTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        where id = #{id,jdbcType=BIGINT}
+        <where>
+            <if test="condition.id != null">
+                AND id = #{condition.id}
+            </if>
+            <if test="condition.name != null and condition.name != '' ">
+                AND name = #{condition.name}
+            </if>
+            <if test="condition.age != null">
+                AND age = #{condition.age}
+            </if>
+        </where>
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.jessin.practice.spring.cloud.api.dto.resp.UserDTO">
+    <update id="updateByPrimaryKey" parameterType="com.jessin.practice.spring.cloud.provider.entity.UserDO">
         update tb_user
         set name = #{name,jdbcType=VARCHAR},
         sex = #{sex,jdbcType=TINYINT},

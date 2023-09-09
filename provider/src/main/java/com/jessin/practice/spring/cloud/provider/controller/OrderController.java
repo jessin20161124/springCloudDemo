@@ -3,7 +3,7 @@ package com.jessin.practice.spring.cloud.provider.controller;
 
 import com.jessin.practice.spring.cloud.api.dto.resp.*;
 import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
-import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryReq;
 import com.jessin.practice.spring.cloud.provider.bo.OrderBO;
 import com.jessin.practice.spring.cloud.provider.bo.OrderStatisticBO;
 import com.jessin.practice.spring.cloud.provider.service.OrderService;
@@ -24,7 +24,8 @@ import java.util.stream.Collectors;
 /**
  * todo 前端流量和业务后端的流量都是通过这里
  * todo 异常处理器
- * todo es/redis/db等操作下层到infrastructure这一层，并提供通用接口，同时提供防腐层，定义通用的maven插件模版
+ * todo es/redis/db等操作下层到infrastructure这一层，并提供通用接口，
+ * todo 同时提供防腐层（依赖隔离，DTO/BO/DO隔离，上层依赖下层controller->service->data->api，下层不能依赖上层data->service->controller，给出依赖关系图谱），定义通用的maven插件模版，抽取接口
  */
 @RestController
 @Slf4j
@@ -34,7 +35,7 @@ public class OrderController {
 
     /**
      * 返回值最好要复杂数据结构，以遍后续扩展
-     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":131, "remark":"hello world","cancelReason":"hellow","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":140, "remark":"我是备注，我买了一台电**脑，请帮忙看下，是否合适","cancelReason":"我是取消原因","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
      * @param createOrderReq
      * @return
      */
@@ -55,7 +56,7 @@ public class OrderController {
      * @return
      */
     @PostMapping("/queryOrder")
-    public HttpResult<OrderDTO> queryOrder(@RequestBody OrderQueryCondition orderQueryCondition) {
+    public HttpResult<OrderDTO> queryOrder(@RequestBody OrderQueryReq orderQueryCondition) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryCondition);
         Optional<OrderBO> orderBOOptional = orderService.selectOrder(orderQueryCondition.getOrderNo());
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryCondition, orderBOOptional);
@@ -88,7 +89,6 @@ public class OrderController {
 
     /**
      *
-     * todo 封装分页DTO，适配前端分页组件
      curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"orderNo":7100765053793131088}' "http://localhost:9999/searchOrder"
      curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"uid":123}' "http://localhost:9999/searchOrder"
 
@@ -98,29 +98,31 @@ public class OrderController {
      分词字段搜索：
      curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"remarkLike":"world hello"}' "http://localhost:9999/searchOrder"
 
-     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"createTimeBegin":"2023-08-29 21:32:34", "pageNo":1, "pageSize":10}' "http://localhost:9999/searchOrder"
-     * 注意，注解均需要再写一遍
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"createTimeBegin":"2023-08-29 21:32:34", "pageNo":2, "pageSize":3}' "http://localhost:9999/searchOrder"     * 注意，注解均需要再写一遍
      * @param orderQueryCondition
      * @return
      */
     @PostMapping("/searchOrder")
-    public HttpResult<List<OrderDTO>> searchOrder(@Valid @RequestBody OrderQueryCondition orderQueryCondition) {
+    public HttpResult<PageResult<List<OrderDTO>>> searchOrder(@Valid @RequestBody OrderQueryReq orderQueryCondition) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryCondition);
+        // todo 由这层转换入参和出参是合理的
         List<OrderBO> orderBOList = orderService.searchOrder(orderQueryCondition);
         // 条数，其实本身已经有了
-        orderService.countOrder(orderQueryCondition);
+        long total = orderService.countOrder(orderQueryCondition);
+
+        List<OrderDTO> orderDTOList = orderBOList.stream().map(orderBO -> {
+                    // 这种代码，更适合放在聚合层里，而且需要支持按需查询，不是所有字段都需要
+                    OrderDTO orderDTO = new OrderDTO();
+                    // 名字相同类型不一样，不会自动copy
+                    BeanUtils.copyProperties(orderBO, orderDTO);
+                    orderDTO.setOrderNo(String.valueOf(orderBO.getOrderNo()));
+                    orderDTO.setOrderStatusDesc("支付中");
+                    orderDTO.setStoreName("men");
+                    return orderDTO;
+                }).collect(Collectors.toList());
 
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryCondition, orderBOList);
-        return HttpResult.success(orderBOList.stream().map(orderBO -> {
-            // 这种代码，更适合放在聚合层里，而且需要支持按需查询，不是所有字段都需要
-            OrderDTO orderDTO = new OrderDTO();
-            // 名字相同类型不一样，不会自动copy
-            BeanUtils.copyProperties(orderBO, orderDTO);
-            orderDTO.setOrderNo(String.valueOf(orderBO.getOrderNo()));
-            orderDTO.setOrderStatusDesc("支付中");
-            orderDTO.setStoreName("men");
-            return orderDTO;
-        }).collect(Collectors.toList()));
+        return HttpResult.success(new PageResult<>(orderDTOList, total, orderQueryCondition.getPageNo(), orderQueryCondition.getPageSize()));
     }
 
     /**
@@ -142,14 +144,14 @@ public class OrderController {
      * @return
      */
     @PostMapping("/scrollOrder")
-    public HttpResult<ScrollResult<List<OrderDTO>>> scrollOrder(@Valid @RequestBody OrderQueryCondition orderQueryCondition) {
+    public HttpResult<ScrollResult<List<OrderDTO>>> scrollOrder(@Valid @RequestBody OrderQueryReq orderQueryCondition) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryCondition);
         ScrollResult<List<OrderBO>> orderBOList = orderService.scrollOrder(orderQueryCondition);
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryCondition, orderBOList);
 
         // todo 统一抽取到converter工具类中
         List<OrderDTO> list = orderBOList.getData().stream().map(orderBO -> {
-            // 这种代码，更适合放在聚合层里，而且需要支持按需查询，不是所有字段都需要
+            // 这种代码，更适合放在聚合层里BO，而且需要支持按需查询，不是所有字段都需要
             OrderDTO orderDTO = new OrderDTO();
             // 名字相同类型不一样，不会自动copy
             BeanUtils.copyProperties(orderBO, orderDTO);
@@ -172,7 +174,7 @@ public class OrderController {
      * @return
      */
     @PostMapping("/statisticOrder")
-    public HttpResult<List<OrderStatisticDTO>> statisticOrder(@Valid @RequestBody OrderQueryCondition orderQueryCondition) {
+    public HttpResult<List<OrderStatisticDTO>> statisticOrder(@Valid @RequestBody OrderQueryReq orderQueryCondition) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryCondition);
         List<OrderStatisticBO> orderBOList = orderService.statisticOrder(orderQueryCondition);
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryCondition, orderBOList);

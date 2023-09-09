@@ -173,6 +173,7 @@ spring:
       sql:
         show: true
     # todo 先分库再分表，看order_no最后10位：11111 11111  库看前面5位，表看后面5位，32个库，32张表，共1024张表
+    # todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源
     sharding:
       tables:
         tb_order:
@@ -199,6 +200,17 @@ spring:
               sharding-column: 1
 
           # todo 如果不是表里的字段，是threadLocal，又该如何映射，如何自定义扩展呢？
+
+
+  data:
+    # todo mongo是否有连接池
+    mongodb:
+      host: 101.43.195.208
+      port: 27017
+      username: mongo
+      database: test
+      password: ${mongoPassword}
+
 redisson:
   host: 101.43.195.208:6379
   password: ${redissonPassword}
@@ -216,3 +228,5 @@ logging:
     root: info
     # 打印es curl请求日志，具体可看org.elasticsearch.client.RequestLogger
     tracer: trace
+    # 打印mongo日志
+    org.springframework.data.mongodb.core.MongoTemplate: debug

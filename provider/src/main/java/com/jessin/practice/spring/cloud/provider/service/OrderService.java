@@ -2,7 +2,7 @@ package com.jessin.practice.spring.cloud.provider.service;
 
 import com.google.common.base.Preconditions;
 import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
-import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryReq;
 import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.common.IdGenerator;
 import com.jessin.practice.spring.cloud.common.RandomIdGenerator;
@@ -107,17 +107,19 @@ public class OrderService {
         // todo 计算总金额，需要支付的金额，运费，和传递回来的金额比较。冻结商品库存/优惠券/积分等
         orderDO.setTotalAmount(BigDecimal.valueOf(5.2));
         orderDO.setPayAmount(BigDecimal.valueOf(4.2));
+        // todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源
         long orderNo = idGenerator.nextId();
         log.info("orderNo: {}", orderNo);
         orderDO.setOrderNo(orderNo);
         // todo 保存商品快照
         // todo 枚举，待支付状态
         orderDO.setOrderStatus((byte)0);
+        // 时间在代码中生成，更加灵活
         orderDO.setCreateTime(new Date());
         orderDO.setLastModifiedTime(new Date());
         orderDO.setRemark(createOrderReq.getRemark());
         orderDO.setCancelReason(createOrderReq.getCancelReason());
-        // 创建订单，
+        // 创建订单
         boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
         Preconditions.checkArgument(ok, "创建订单失败");
         // todo 改成异步
@@ -194,7 +196,7 @@ public class OrderService {
      * @param orderQueryCondition
      * @return
      */
-    public List<OrderBO> searchOrder(OrderQueryCondition orderQueryCondition) {
+    public List<OrderBO> searchOrder(OrderQueryReq orderQueryCondition) {
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -226,7 +228,7 @@ public class OrderService {
         }).collect(Collectors.toList());
     }
 
-    public ScrollResult<List<OrderBO>> scrollOrder(OrderQueryCondition orderQueryCondition) {
+    public ScrollResult<List<OrderBO>> scrollOrder(OrderQueryReq orderQueryCondition) {
 
         SearchSourceBuilder searchSourceBuilder = null;
 
@@ -281,7 +283,7 @@ public class OrderService {
      * @param orderQueryCondition
      * @return
      */
-    public long countOrder(OrderQueryCondition orderQueryCondition) {
+    public long countOrder(OrderQueryReq orderQueryCondition) {
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -317,7 +319,7 @@ public class OrderService {
      * @param orderQueryCondition
      * @return
      */
-    public List<OrderStatisticBO> statisticOrder(OrderQueryCondition orderQueryCondition) {
+    public List<OrderStatisticBO> statisticOrder(OrderQueryReq orderQueryCondition) {
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -354,7 +356,7 @@ public class OrderService {
         return orderStatisticBOS;
     }
 
-    private static BoolQueryBuilder transform2BoolQueryBuilder(OrderQueryCondition orderQueryCondition) {
+    private static BoolQueryBuilder transform2BoolQueryBuilder(OrderQueryReq orderQueryCondition) {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         if (StringUtils.isNotBlank(orderQueryCondition.getOrderNo())) {
             TermQueryBuilder queryBuilder = QueryBuilders.termQuery("orderNo", orderQueryCondition.getOrderNo());

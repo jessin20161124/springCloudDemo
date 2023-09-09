@@ -1,8 +1,9 @@
 package com.jessin.practice.spring.cloud.consumer.controller;
 
 import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
-import com.jessin.practice.spring.cloud.api.dto.req.UserQueryCondition;
+import com.jessin.practice.spring.cloud.api.dto.req.UserQueryReq;
 import com.jessin.practice.spring.cloud.api.UserServiceFeignClient;
+import com.jessin.practice.spring.cloud.api.dto.resp.PageResult;
 import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import com.jessin.practice.spring.cloud.consumer.service.NacosCloudService;
 import lombok.extern.slf4j.Slf4j;
@@ -62,9 +63,9 @@ public class ConfigController {
      * @return
      */
     @RequestMapping("/getUserByName")
-    public HttpResult<List<UserDTO>> getUserByName(String name) {
+    public HttpResult<PageResult<List<UserDTO>>> getUserByName(String name) {
         log.info("name is {}, myKey:{}", name, nacosCloudService.getMyKey());
-        UserQueryCondition userQueryCondition = new UserQueryCondition();
+        UserQueryReq userQueryCondition = new UserQueryReq();
         userQueryCondition.setName(name);
         return userServiceFeignClient.queryUser(userQueryCondition);
     }

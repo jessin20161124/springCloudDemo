@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-public class OrderQueryCondition {
+public class OrderQueryReq {
     private String orderNo;
     private String uid;
     private String remark;

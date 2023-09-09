@@ -42,6 +42,16 @@
 			<artifactId>redisson</artifactId>
 		</dependency>
 
+		<!-- mongodb和spring-boot对应关系：https://docs.spring.io/spring-data/mongodb/docs/3.2.4/reference/html/#compatibility.matrix -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
