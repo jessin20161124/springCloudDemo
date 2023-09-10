@@ -17,10 +17,6 @@
 			<artifactId>api</artifactId>
 			<groupId>com.jessin.practice.spring.cloud</groupId>
 		</dependency>
-		<dependency>
-			<artifactId>common</artifactId>
-			<groupId>com.jessin.practice.spring.cloud</groupId>
-		</dependency>
 		<!--
     1.0.0版本无法扫描classpath:*Mapper.xml
     1.3.0可以，注入的是String[]，

@@ -1,4 +1,4 @@
-package com.jessin.practice.spring.cloud.api.dto.resp;
+package com.jessin.practice.spring.cloud.common;
 
 import lombok.Data;
 
@@ -31,7 +31,7 @@ public class PageResult<T> {
 
     // 其实后面这两个，可以不需要，前端是知道的
     /**
-     * 页码，从0开始
+     * 页码，从1开始
      */
     private int pageIndex;
 

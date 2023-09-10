@@ -2,14 +2,14 @@ package com.jessin.practice.spring.cloud.provider.controller;
 
 import com.jessin.practice.spring.cloud.api.dto.req.UserQueryReq;
 import com.jessin.practice.spring.cloud.api.dto.req.UserUpdateReq;
-import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
-import com.jessin.practice.spring.cloud.api.dto.resp.PageResult;
+import com.jessin.practice.spring.cloud.common.HttpResult;
+import com.jessin.practice.spring.cloud.common.PageResult;
 import com.jessin.practice.spring.cloud.api.dto.resp.UserDTO;
 import com.jessin.practice.spring.cloud.api.dto.resp.UserStatisticDTO;
 import com.jessin.practice.spring.cloud.provider.bo.UserQueryCondition;
+import com.jessin.practice.spring.cloud.provider.converter.UserTransformer;
 import com.jessin.practice.spring.cloud.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  * 这里最好不要实现接口，不然后续增加接口的话，可能会编译不通过，或者使用默认方法
- * todo 对于@Valid，抽取通用报错返回。如果绕过接口，直接操作数据库（后门），可能会导致不一致，而且问题不好排查。
+ * todo 如果绕过接口，直接操作数据库（后门），可能会导致不一致，而且问题不好排查。
  * todo 毕竟有业务逻辑，不是只操作一条记录就能搞定的，例如还需要插入es/mongodb；能自动操作，就不要依赖人
  *
  * @Author: jessin
@@ -50,18 +50,10 @@ public class UserServiceFeignClientImpl {
     @RequestMapping("/queryUser")
     public HttpResult<PageResult<List<UserDTO>>> queryUser(@Valid @RequestBody UserQueryReq userQueryReq) {
         log.info("provider 实现，userQueryReq is {}", userQueryReq);
-        UserQueryCondition userQueryCondition = new UserQueryCondition();
-        BeanUtils.copyProperties(userQueryReq, userQueryCondition);
-        // 一个字段的类型，最好固定
-        // mongodb _id的类型可以自定义，如果不传递，创建时默认是ObjectId类型
-        // 如果传递了数字，则是数字类型，这里查不出来，必须改为userQueryCondition.getId为long
-        if (userQueryReq.getId() != null) {
-            userQueryCondition.setId(userQueryReq.getId());
-        } else if (userQueryReq.getLongId() != null) {
-            userQueryCondition.setId(userQueryReq.getLongId());
-        }
+        UserQueryCondition userQueryCondition = UserTransformer.convert(userQueryReq);
+        // 按理，下面应该返回BO，这一层转化为DTO，上层是下层的使用方
         PageResult<List<UserDTO>> userDTOList = userService.queryUser(userQueryCondition);
-        log.debug("查询userQueryCondition：{}，对应的用户为：{}", userQueryReq, userDTOList);
+        log.debug("查询userQueryReq：{}，对应的用户为：{}", userQueryReq, userDTOList);
         return HttpResult.success(userDTOList);
     }
 
@@ -75,8 +67,7 @@ public class UserServiceFeignClientImpl {
     @RequestMapping("/statisticUser")
     public HttpResult<List<UserStatisticDTO>> statisticUser(@Valid @RequestBody UserQueryReq userQueryReq) {
         log.info("provider 实现，userQueryReq is {}", userQueryReq);
-        UserQueryCondition userQueryCondition = new UserQueryCondition();
-        BeanUtils.copyProperties(userQueryReq, userQueryCondition);
+        UserQueryCondition userQueryCondition = UserTransformer.convert(userQueryReq);
         List<UserStatisticDTO> userDTOList = userService.statisticUser(userQueryCondition);
         log.debug("查询userQueryCondition：{}，对应的用户为：{}", userQueryReq, userDTOList);
         return HttpResult.success(userDTOList);

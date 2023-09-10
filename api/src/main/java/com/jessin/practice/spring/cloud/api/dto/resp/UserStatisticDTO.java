@@ -6,6 +6,9 @@ import lombok.Data;
 @Data
 public class UserStatisticDTO {
 
+    /**
+     * 貌似只能用id接收，但是实际是name
+     */
     @JsonProperty("name")
     private String id;
 

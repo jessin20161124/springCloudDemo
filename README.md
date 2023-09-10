@@ -13,15 +13,18 @@
 - [x] 封装feign HttpResult
 - [x] docker/k8s部署
 - [x] hystrix熔断，sentinel尝试
-- [x] spring-kafka集成
-- [x] sharding-jdbc分库分表
-- [x] es 6.4.3集成
-
+- [x] kafka1.0.2安装，spring-kafka集成
+- [x] sharding-jdbc分库分表，pagehelper使用
+- [x] es 6.4.3集成，中文分词插件ik安装
+- [x] mongo 4.0.28集成
+- [x] 通用工具包封装，例如ExceptionHandler，异常码
 
 ### TODO LIST
 - [ ] spring cloud gateway微服务网关集成，谓词测试，流程图补充
-- [ ] 通用工具包封装，抽取几个子域公共代码，例如ExceptionHandler
+- [ ] 抽取几个子域公共代码，kafka/es等中间件
 - [ ] ddd分层领域驱动设计，防腐层添加，基础设施层设计，DTO/BO/DO之间的关系梳理清楚
+- [ ] checkstyle安装
+- [ ] apollo集成
 
 ### 博客参考
 [spring cloud实践](https://blog.csdn.net/ac_dao_di/article/details/126070583)

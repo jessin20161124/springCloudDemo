@@ -36,7 +36,7 @@ import java.util.Map;
 import static com.jessin.practice.spring.cloud.provider.constant.EsIndexConstants.DEFAULT_TYPE;
 
 /**
- * 新字段，无默认值
+ * 新字段，无默认值。老数据没这个字段
  * https://zhuanlan.zhihu.com/p/159138736
  * todo spring-data-es如何集成，通过注解即可实现，也可以实现类似效果
  * todo head插件安装，查看es数据

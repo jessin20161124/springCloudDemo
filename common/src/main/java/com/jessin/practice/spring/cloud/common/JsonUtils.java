@@ -1,12 +1,17 @@
 package com.jessin.practice.spring.cloud.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 
+/**
+ * 不用使用fastjson!
+ */
 @Slf4j
+@UtilityClass
 public class JsonUtils {
 
     private static ObjectMapper objectMapper;

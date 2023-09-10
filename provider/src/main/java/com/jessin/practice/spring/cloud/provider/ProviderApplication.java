@@ -1,8 +1,10 @@
 package com.jessin.practice.spring.cloud.provider;
 
+import com.jessin.practice.spring.cloud.common.GlobalExceptionHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * spring cloud服务注册，使用spring boot actuator做健康检查...需要保证向consul注册的健康检查url是正确的，
@@ -21,4 +23,8 @@ public class ProviderApplication {
 		SpringApplication.run(ProviderApplication.class, args);
 	}
 
+	@Bean
+	public GlobalExceptionHandler globalExceptionHandler() {
+		return new GlobalExceptionHandler();
+	}
 }

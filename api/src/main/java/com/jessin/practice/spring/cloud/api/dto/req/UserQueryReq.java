@@ -20,15 +20,15 @@ public class UserQueryReq {
      * 页数，从1开始
      */
     @NotNull
-    @Min(1)
+    @Min(value = 1, message = "页码必须从1开始")
     private Integer pageNo = 1;
 
     /**
      * 页面数量
      */
     @NotNull
-    @Min(1)
-    @Max(100)
+    @Min(value = 1, message = "页大小必须为[1,100]")
+    @Max(value = 100, message = "页大小必须为[1,100]")
     private Integer pageSize = 10;
 
     public int getOffset() {

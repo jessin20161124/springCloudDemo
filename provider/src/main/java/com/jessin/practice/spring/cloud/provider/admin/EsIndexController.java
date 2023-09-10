@@ -1,7 +1,7 @@
 package com.jessin.practice.spring.cloud.provider.admin;
 
 
-import com.jessin.practice.spring.cloud.api.dto.resp.HttpResult;
+import com.jessin.practice.spring.cloud.common.HttpResult;
 import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
 import com.jessin.practice.spring.cloud.api.dto.resp.CreateOrderResp;
 import com.jessin.practice.spring.cloud.provider.es.ElasticSearchOperation;
