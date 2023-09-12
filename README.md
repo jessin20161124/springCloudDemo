@@ -9,11 +9,11 @@
 - [x] 使用ribbon进行负载均衡
 - [x] 实现nacos spring cloud配置变更方法回调
 - [x] 支持配置中心变更时refresh属性配置
-- [x] 支持使用redisson/分布式锁/redis等操作
+- [x] 支持使用redisson/分布式锁/redis 5.0.7等操作
 - [x] 封装feign HttpResult
 - [x] docker/k8s部署
 - [x] hystrix熔断，sentinel尝试
-- [x] kafka1.0.2安装，spring-kafka集成
+- [x] kafka 1.0.2安装，spring-kafka集成
 - [x] sharding-jdbc分库分表，pagehelper使用
 - [x] es 6.4.3集成，中文分词插件ik安装
 - [x] mongo 4.0.28集成

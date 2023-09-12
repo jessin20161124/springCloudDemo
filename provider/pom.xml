@@ -38,6 +38,7 @@
 			<artifactId>redisson</artifactId>
 		</dependency>
 
+		<!-- spring-data提供相关template，例如MongoTemplate/HbaseTemplate -->
 		<!-- mongodb和spring-boot对应关系：https://docs.spring.io/spring-data/mongodb/docs/3.2.4/reference/html/#compatibility.matrix -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -46,6 +47,45 @@
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
+		</dependency>
+
+		<!-- hbase没有相关的自动化配置类，没有spring-boot-starter spring-data-hbase相关包已经很久没有更新 -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-hadoop-hbase</artifactId>
+			<version>2.5.0.RELEASE</version>
+			<exclusions>
+				<!-- 避免和内嵌tomcat带的包冲突 -->
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet.jsp</groupId>
+					<artifactId>jsp-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-hadoop</artifactId>
+			<version>2.5.0.RELEASE</version>
+		</dependency>
+		<!-- 上面两个包引进hbase-client时是optional方式，所以需要再引进下，需要和服务端对应 -->
+		<!-- 版本对应关系：https://blog.csdn.net/liubenlong007/article/details/95340332 -->
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
+<!--			<version>0.98.5-hadoop2</version>-->
+			<version>1.1.2</version>
+
+			<exclusions>
+				<!-- 暂时使用spring-boot引进的logback-->
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 	</dependencies>

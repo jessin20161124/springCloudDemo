@@ -3,7 +3,10 @@ package com.jessin.practice.spring.cloud.provider.controller;
 
 import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
 import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryReq;
-import com.jessin.practice.spring.cloud.api.dto.resp.*;
+import com.jessin.practice.spring.cloud.api.dto.resp.CreateOrderResp;
+import com.jessin.practice.spring.cloud.api.dto.resp.OrderDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.OrderStatisticDTO;
+import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.common.HttpResult;
 import com.jessin.practice.spring.cloud.common.ListUtils;
 import com.jessin.practice.spring.cloud.common.PageResult;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
  * todo 同时提供防腐层（依赖隔离，DTO/BO/DO隔离，上层依赖下层(controller->service->data)->api -> common，下层不能依赖上层data->service->controller，给出依赖关系图谱），定义通用的maven插件模版，抽取接口
         拆分子pom，天然隔离，无法乱写代码
       controller不要有太重的业务逻辑，进行组装即可
+   todo 请求日志参数、结果和耗时打印，添加到common包
+ todo 使用jenkins部署？
  */
 @RestController
 @Slf4j
@@ -39,7 +44,7 @@ public class OrderController {
 
     /**
      * 返回值最好要复杂数据结构，以遍后续扩展
-     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":140, "remark":"我是备注，我买了一台电**脑，请帮忙看下，是否合适","cancelReason":"我是取消原因","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":151, "remark":"我是备注，我买了一台电**脑，请帮忙看下，是否合适","cancelReason":"我是取消原因","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
      * @param createOrderReq
      * @return
      */
@@ -54,7 +59,7 @@ public class OrderController {
     }
 
     /**
-     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"orderNo":7100765053793131088}' "http://localhost:9999/queryOrder"
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"orderNo":7107219370491861379}' "http://localhost:9999/queryOrder"
      * 注意，注解均需要再写一遍
      * @param orderQueryReq
      * @return
@@ -108,6 +113,27 @@ public class OrderController {
 
         log.debug("查询orderQueryReq {} 对应订单 {}", orderQueryReq, orderBOList);
         return HttpResult.success(new PageResult<>(orderDTOList, total, orderQueryReq.getPageNo(), orderQueryReq.getPageSize()));
+    }
+
+    /**
+     *
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"uid":123}' "http://localhost:9999/searchArchiveOrder"
+
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"uid":345, "createTimeBegin":"2023-08-29 21:32:34", "createTimeEnd":"2023-09-30 21:32:34", "pageNo":2, "pageSize":3}' "http://localhost:9999/searchArchiveOrder"
+     * @param orderQueryReq
+     * @return
+     */
+    @PostMapping("/searchArchiveOrder")
+    public HttpResult<List<OrderDTO>> searchArchiveOrder(@Valid @RequestBody OrderQueryReq orderQueryReq) {
+        log.info("provider 实现，orderQueryReq is {}", orderQueryReq);
+        // todo uid必填
+        // 由这层转换入参和出参是合理的
+        List<OrderBO> orderBOList = orderService.searchOrder(orderQueryReq.getUid(), orderQueryReq.getCreateTimeBegin(), orderQueryReq.getCreateTimeEnd());
+
+        List<OrderDTO> orderDTOList = orderBOList.stream().map(OrderTransformer::convert).collect(Collectors.toList());
+
+        log.debug("查询orderQueryReq {} 对应订单 {}", orderQueryReq, orderBOList);
+        return HttpResult.success(orderDTOList);
     }
 
     /**

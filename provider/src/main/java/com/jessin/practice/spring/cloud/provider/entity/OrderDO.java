@@ -126,6 +126,7 @@ public class OrderDO implements Serializable, EsDocument {
     }
 
     /**
+     * todo @Transient
      * 不持久化，仅内存临时使用
      * @return
      */
@@ -144,5 +145,23 @@ public class OrderDO implements Serializable, EsDocument {
     @Override
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDO{" +
+                "id=" + id +
+                ", orderNo=" + orderNo +
+                ", remark='" + remark + '\'' +
+                ", cancelReason='" + cancelReason + '\'' +
+                ", uid=" + uid +
+                ", storeId=" + storeId +
+                ", totalAmount=" + totalAmount +
+                ", payAmount=" + payAmount +
+                ", orderStatus=" + orderStatus +
+                ", createTime=" + createTime +
+                ", lastModifiedTime=" + lastModifiedTime +
+                ", version=" + version +
+                '}';
     }
 }

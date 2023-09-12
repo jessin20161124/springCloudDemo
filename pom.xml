@@ -58,12 +58,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <artifactId>common</artifactId>
-                <groupId>com.jessin.practice.spring.cloud</groupId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- 以后使用redisson作为所有分布式锁，分布式对象等功能框架-->
             <dependency>
                 <groupId>org.redisson</groupId>
@@ -91,16 +85,19 @@
                 <version>3.9</version>
             </dependency>
 
+            <!-- hbase-client依赖了，需要比较低的版本，20不行-->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>15.0</version>
+            </dependency>
+
         </dependencies>
+
+
     </dependencyManagement>
 
     <dependencies>
-
-        <dependency>
-            <artifactId>common</artifactId>
-            <groupId>com.jessin.practice.spring.cloud</groupId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

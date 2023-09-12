@@ -6,6 +6,7 @@ import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.provider.bo.OrderBO;
 import com.jessin.practice.spring.cloud.provider.bo.OrderStatisticBO;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ public interface OrderService {
     boolean cancelOrder(String orderNo);
 
     List<OrderBO> searchOrder(OrderQueryReq orderQueryCondition);
+
+    List<OrderBO> searchOrder(String uid, Date createTimeBegin, Date createTimeEnd);
 
     ScrollResult<List<OrderBO>> scrollOrder(OrderQueryReq orderQueryCondition);
 

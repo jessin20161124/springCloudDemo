@@ -13,6 +13,7 @@ import com.jessin.practice.spring.cloud.provider.constant.EsIndexConstants;
 import com.jessin.practice.spring.cloud.provider.entity.OrderDO;
 import com.jessin.practice.spring.cloud.provider.entity.OrderDOExample;
 import com.jessin.practice.spring.cloud.provider.es.ElasticSearchOperation;
+import com.jessin.practice.spring.cloud.provider.hbase.HbaseService;
 import com.jessin.practice.spring.cloud.provider.mapper.OrderDOMapper;
 import com.jessin.practice.spring.cloud.provider.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -89,6 +91,9 @@ public class OrderServiceImpl implements OrderService  {
     private OrderDOMapper orderDOMapper;
 
     @Resource
+    private HbaseService hbaseService;
+
+    @Resource
     private ElasticSearchOperation elasticSearchOperation;
 
     // 用随机数，避免冲突，雪花算法最后12bit在并发低的情况下是0
@@ -100,32 +105,43 @@ public class OrderServiceImpl implements OrderService  {
      * @param createOrderReq
      * @return
      */
+    @Transactional
     public String createOrder(CreateOrderReq createOrderReq) {
         OrderDO orderDO = new OrderDO();
         orderDO.setStoreId(createOrderReq.getStoreId());
         // todo 从上下文拿到登陆uid信息
-        orderDO.setUid(123L);
+        orderDO.setUid(345L);
         // todo 计算总金额，需要支付的金额，运费，和传递回来的金额比较。冻结商品库存/优惠券/积分等
         orderDO.setTotalAmount(BigDecimal.valueOf(5.2));
         orderDO.setPayAmount(BigDecimal.valueOf(4.2));
-        // todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源
+        // todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源，最常见的也是最实时的查询方式，其他查询方式通过es查询
         long orderNo = idGenerator.nextId();
         log.info("orderNo: {}", orderNo);
         orderDO.setOrderNo(orderNo);
         // todo 保存商品快照
         // todo 枚举，待支付状态
         orderDO.setOrderStatus((byte)0);
+        Date now = getNow();
         // 时间在代码中生成，更加灵活
-        orderDO.setCreateTime(new Date());
-        orderDO.setLastModifiedTime(new Date());
+        orderDO.setCreateTime(now);
+        orderDO.setLastModifiedTime(now);
         orderDO.setRemark(createOrderReq.getRemark());
         orderDO.setCancelReason(createOrderReq.getCancelReason());
         // 创建订单
         boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
         Preconditions.checkArgument(ok, "创建订单失败");
-        // todo 改成异步
+        // todo 改成异步，重试直到成功
         elasticSearchOperation.createDocument(EsIndexConstants.ORDER_INFO_INDEX, orderDO);
+        hbaseService.putDataToHBase(orderDO);
         return String.valueOf(orderDO.getOrderNo());
+    }
+
+    /**
+     * 去除毫秒，存到db里不会存毫秒，可能会进位，导致跟内存里的不一致
+     * @return
+     */
+    private Date getNow() {
+        return new Date(System.currentTimeMillis() / 1000 * 1000);
     }
 
     /**
@@ -139,7 +155,12 @@ public class OrderServiceImpl implements OrderService  {
         OrderDOExample.Criteria criteria = orderDOExample.or();
         criteria.andOrderNoEqualTo(Long.parseLong(orderNo));
         List<OrderDO> list = orderDOMapper.selectByExample(orderDOExample);
-        return list.stream().findFirst().map(orderDO -> {
+        Optional<OrderDO> orderDOOptional = list.stream().findFirst();
+        if (orderDOOptional.isPresent()) {
+            OrderDO orderDO = hbaseService.query(String.valueOf(orderDOOptional.get().getUid()), orderDOOptional.get().getCreateTime(), orderNo);
+            log.info("hbase query order {}", orderDO);
+        }
+        return orderDOOptional.map(orderDO -> {
             OrderBO orderBO = new OrderBO();
             BeanUtils.copyProperties(orderDO, orderBO);
             return orderBO;
@@ -223,6 +244,12 @@ public class OrderServiceImpl implements OrderService  {
 //        searchSourceBuilder.fetchSource(retFields, excludeFields);
         List<OrderDO> list = elasticSearchOperation.searchDocument(EsIndexConstants.ORDER_INFO_INDEX, searchSourceBuilder, OrderDO.class);
         // DO -> BO，这一层转换是合理的
+        return ListUtils.transformBeanList(list, OrderBO.class);
+    }
+
+    @Override
+    public List<OrderBO> searchOrder(String uid, Date createTimeBegin, Date createTimeEnd) {
+        List<OrderDO> list = hbaseService.query(uid, createTimeBegin, createTimeEnd);
         return ListUtils.transformBeanList(list, OrderBO.class);
     }
 

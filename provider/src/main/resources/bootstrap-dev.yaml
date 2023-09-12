@@ -46,8 +46,9 @@ spring:
         jdbc-url: jdbc:mysql://${dbIp}:3306?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
         username: ${dbUser}
         password: ${dbUserPassword}
-        min-idle: 5
-        max-pool-size: 200
+        minimum-idle: 5
+        maximum-pool-size: 200
+        auto-commit: true
         idle-timeout: 30000
         pool-name: MyHikariCP0
         max-lifetime: 1800000
@@ -60,8 +61,9 @@ spring:
         jdbc-url: jdbc:mysql://${dbIp}:3306?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
         username: ${dbUser}
         password: ${dbUserPassword}
-        min-idle: 5
-        max-pool-size: 200
+        minimum-idle: 5
+        maximum-pool-size: 200
+        auto-commit: true
         idle-timeout: 30000
         pool-name: MyHikariCP1
         max-lifetime: 1800000
@@ -222,6 +224,11 @@ elasticsearch:
   conn-timeout: 10000
   socket-timeout: 10000
   connection-request-timeout: 10000
+
+hbase:
+  zookeeper-quorum: 101.43.195.208
+  client-port: 2181
+  znode-parent: /hbase
 
 logging:
   level:

@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 面向外部查询，有校验，不暴露实现细节
+ * 入参，一般用Req后缀或者Param后缀，todo 查看ali的命名规范，黄山版
  */
 @Data
 public class UserQueryReq {

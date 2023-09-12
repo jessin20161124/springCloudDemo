@@ -9,21 +9,21 @@ spring:
       loadOnStartup: 1
     throw-exception-if-no-handler-found: true
     # 代码中已经配置了数据源，这里不生效了
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${dbIp}:3306/spring_cloud?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: ${dbUser}
-    password: ${dbUserPassword}
-    # todo 必须设置连接池大小，否则随着使用会无穷大
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 200
-      auto-commit: true
-      idle-timeout: 30000
-      pool-name: CommonHikariCP
-      max-lifetime: 1800000
-      connection-timeout: 15000
-      connection-test-query: SELECT 1
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://${dbIp}:3306/spring_cloud?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+#    username: ${dbUser}
+#    password: ${dbUserPassword}
+#    # todo 必须设置连接池大小，否则随着使用会无穷大
+#    hikari:
+#      minimum-idle: 5
+#      maximum-pool-size: 200
+#      auto-commit: true
+#      idle-timeout: 30000
+#      pool-name: CommonHikariCP
+#      max-lifetime: 1800000
+#      connection-timeout: 15000
+#      connection-test-query: SELECT 1
     # actuator单独使用一个端口，避免与业务端口共用一个path
 #management:
 #  server:

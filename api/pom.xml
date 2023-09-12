@@ -18,6 +18,15 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <!-- common包放到这里，而不是放到父pom，保证能通过编译 -->
+    <!-- todo common包独立工程，并deploy到mvn repository -->
+    <dependencies>
+        <dependency>
+            <artifactId>common</artifactId>
+            <groupId>com.jessin.practice.spring.cloud</groupId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 <!--    <build>-->
 <!--        <plugins>-->
