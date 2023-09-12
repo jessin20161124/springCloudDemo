@@ -20,7 +20,7 @@ public interface OrderService {
 
     List<OrderBO> searchOrder(OrderQueryReq orderQueryCondition);
 
-    List<OrderBO> searchOrder(String uid, Date createTimeBegin, Date createTimeEnd);
+    List<OrderBO> searchArchiveOrder(String uid, Date createTimeBegin, Date createTimeEnd);
 
     ScrollResult<List<OrderBO>> scrollOrder(OrderQueryReq orderQueryCondition);
 

@@ -92,6 +92,12 @@
                 <version>15.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.4</version>
+            </dependency>
+
         </dependencies>
 
 
@@ -179,11 +185,6 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
-        </dependency>
-
         <!-- 保证@Valid生效 -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -196,15 +197,14 @@
 <!--            <version>4.1.1</version>-->
 <!--        </dependency>-->
 
-        <!-- 注意版本对应关系：https://blog.csdn.net/Chollian/article/details/116161466 -->
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
 
     </dependencies>

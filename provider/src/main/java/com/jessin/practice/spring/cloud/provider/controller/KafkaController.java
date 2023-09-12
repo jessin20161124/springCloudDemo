@@ -19,7 +19,7 @@ public class KafkaController {
      *
      * key/value均必须是字符串，使用序列化器：org.apache.kafka.common.serialization.StringSerializer
      *
-     * http://localhost:9999/send/abc
+     * http://localhost:9999/send/def
      * @param input
      */
     @GetMapping("/send/{input}")

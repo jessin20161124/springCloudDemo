@@ -18,10 +18,12 @@
 - [x] es 6.4.3集成，中文分词插件ik安装
 - [x] mongo 4.0.28集成
 - [x] 通用工具包封装，例如ExceptionHandler，异常码
+- [x] hbase 2.1.9集成
 
 ### TODO LIST
 - [ ] spring cloud gateway微服务网关集成，谓词测试，流程图补充
 - [ ] 抽取几个子域公共代码，kafka/es等中间件
+- [ ] 用户域等登陆鉴权
 - [ ] ddd分层领域驱动设计，防腐层添加，基础设施层设计，DTO/BO/DO之间的关系梳理清楚
 - [ ] checkstyle安装
 - [ ] apollo集成

@@ -11,6 +11,13 @@ import java.util.Date;
 
 public class OrderRowMapper implements RowMapper<OrderDO> {
 
+    /**
+     * 支持只查部分列
+     * @param result
+     * @param rowNum
+     * @return
+     * @throws Exception
+     */
     @Override
     public OrderDO mapRow(Result result, int rowNum) throws Exception {
 

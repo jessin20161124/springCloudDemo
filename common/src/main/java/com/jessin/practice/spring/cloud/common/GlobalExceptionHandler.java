@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends AbstractHandlerMethodExceptionResolv
         HttpResult httpResult;
         if (ex instanceof CommonCustomException) {
             CommonCustomException commonCustomException = (CommonCustomException)ex;
-            // todo 通过接口，而不是具体的实现类，解耦开来
+            // 通过接口，而不是具体的实现类，解耦开来
             httpResult = HttpResult.fail(commonCustomException);
         } else if (ex instanceof MethodArgumentNotValidException) {
             // valid异常

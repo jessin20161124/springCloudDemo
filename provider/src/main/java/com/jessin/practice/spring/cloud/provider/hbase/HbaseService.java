@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.jessin.practice.spring.cloud.provider.constant.HbaseConstants;
 import com.jessin.practice.spring.cloud.provider.entity.OrderDO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Scan;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
  *
  * 单条数据写入比较强，复杂查询比较弱，需要构建个二级索引，例如这里的rowKey可以是订单号，存储订单详情。然后二级索引支持复杂查询，可以找到订单号，
  * 再查订单详情即可
+ *
+ * rowKey的设计很关键，涉及到scan查询
+ *
  */
 @Service
 @Slf4j
@@ -64,12 +68,19 @@ public class HbaseService {
             filterList.addFilter(new QualifierFilter(CompareFilter.CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(qualifier))));
         }
         Scan scan = new Scan();
-        if (filterList.getFilters().size() > 0) {
+        if (CollectionUtils.isNotEmpty(filterList.getFilters())) {
             scan.setFilter(filterList);
         }
         scan.setStartRow(Bytes.toBytes(startRowkey));
         scan.setStopRow(Bytes.toBytes(stopRowkey));
-
+// 支持行前缀扫描
+//        scan.setRowPrefixFilter();
+        // 最多返回三十条
+//        scan.setMaxResultSize(30);
+        // 每一列返回的版本数
+//        scan.setMaxVersions(10);
+        // 反向扫描
+     //   scan.setReversed(true);
         return hbaseTemplate.find(tableName, scan, rowMapper);
     }
 

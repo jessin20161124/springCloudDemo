@@ -42,8 +42,8 @@ ribbon:
   #重试2台机器，不包括第一台，总共重试(MaxAutoRetries + 1) * (MaxAutoRetriesNextServer + 1)
   MaxAutoRetriesNextServer: 2
   #每次http请求的超时时间
-  ReadTimeout: 2000
-  ConnectTimeout: 2000
+  ReadTimeout: 5000
+  ConnectTimeout: 5000
   #如果对方返回404，抛出异常，以允许重试
   retryableStatusCodes: 404,405,406
   #所有异常都可以重试，否则只有get请求能重试

@@ -128,7 +128,7 @@ public class OrderController {
         log.info("provider 实现，orderQueryReq is {}", orderQueryReq);
         // todo uid必填
         // 由这层转换入参和出参是合理的
-        List<OrderBO> orderBOList = orderService.searchOrder(orderQueryReq.getUid(), orderQueryReq.getCreateTimeBegin(), orderQueryReq.getCreateTimeEnd());
+        List<OrderBO> orderBOList = orderService.searchArchiveOrder(orderQueryReq.getUid(), orderQueryReq.getCreateTimeBegin(), orderQueryReq.getCreateTimeEnd());
 
         List<OrderDTO> orderDTOList = orderBOList.stream().map(OrderTransformer::convert).collect(Collectors.toList());
 

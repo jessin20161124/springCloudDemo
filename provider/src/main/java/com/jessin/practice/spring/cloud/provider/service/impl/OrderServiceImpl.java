@@ -248,7 +248,7 @@ public class OrderServiceImpl implements OrderService  {
     }
 
     @Override
-    public List<OrderBO> searchOrder(String uid, Date createTimeBegin, Date createTimeEnd) {
+    public List<OrderBO> searchArchiveOrder(String uid, Date createTimeBegin, Date createTimeEnd) {
         List<OrderDO> list = hbaseService.query(uid, createTimeBegin, createTimeEnd);
         return ListUtils.transformBeanList(list, OrderBO.class);
     }
