@@ -1,6 +1,8 @@
 ## spring cloud实践
 &nbsp;&nbsp;&nbsp;&nbsp;封装一线大厂常见功能脚手架
 
+![推广](https://img-blog.csdnimg.cn/c88733a80c8c4c8ab2033b6ecd120938.png)
+
 ### 已完成功能列表
 - [x] 基于spring boot 2.1.7.RELEASE + spring cloud Greenwich.SR6进行实验，版本需要对应
 - [x] 使用nacos作为配置中心
