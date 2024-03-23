@@ -170,7 +170,8 @@ public class ElasticSearchServiceImpl implements ElasticSearchOperation {
     /**
      * https://blog.csdn.net/m0_51491702/article/details/124686633
      *
-     * scroll查询，一般不会一下子查询所有，查询所有的话内存很能会爆，而是通过前端分批几次往下查询，每个scroll请求有时间限制，不能太久
+     * scroll查询，一般不会一下子查询所有，查询所有的话内存可能会爆，而是通过前端分批几次往下查询，每个scroll请求有时间限制，不能太久
+     * 只能往下查询
      * 可以先查符合条件的条数，如果超过1万，则提示走scroll
      *
      * @param index

@@ -44,7 +44,7 @@ public class OrderController {
 
     /**
      * 返回值最好要复杂数据结构，以遍后续扩展
-     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":151, "remark":"我是备注，我买了一台电**脑，请帮忙看下，是否合适","cancelReason":"我是取消原因","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
+     curl -X POST -H "content-type: application/json;charset=utf-8" -d '{"storeId":152, "remark":"我是备注，我买了一台电**脑，请帮忙看下，是否合适","cancelReason":"我是取消原因","goodsIdList":[{"goodId":"g122","cartItemId": "cart1", "quantity": "1234"}]}' "http://localhost:9999/createOrder"
      * @param createOrderReq
      * @return
      */

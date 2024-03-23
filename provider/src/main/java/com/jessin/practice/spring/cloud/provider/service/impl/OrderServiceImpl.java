@@ -109,16 +109,17 @@ public class OrderServiceImpl implements OrderService  {
     public String createOrder(CreateOrderReq createOrderReq) {
         OrderDO orderDO = new OrderDO();
         orderDO.setStoreId(createOrderReq.getStoreId());
-        // todo 从上下文拿到登陆uid信息
+        // todo 1. 从上下文拿到登陆uid信息，参数校验
         orderDO.setUid(345L);
-        // todo 计算总金额，需要支付的金额，运费，和传递回来的金额比较。冻结商品库存/优惠券/积分等
+        // todo tcc实现分布式事务，2. 先createOrder，设置不可见
+        // todo 3. 风控校验、限购校验，计算总金额，需要支付的金额，运费，和传递回来的金额比较。冻结商品库存/优惠券/积分等
         orderDO.setTotalAmount(BigDecimal.valueOf(5.2));
         orderDO.setPayAmount(BigDecimal.valueOf(4.2));
         // todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源，最常见的也是最实时的查询方式，其他查询方式通过es查询
         long orderNo = idGenerator.nextId();
         log.info("orderNo: {}", orderNo);
         orderDO.setOrderNo(orderNo);
-        // todo 保存商品快照
+        // todo 保存商品快照，清空购物车
         // todo 枚举，待支付状态
         orderDO.setOrderStatus((byte)0);
         Date now = getNow();
@@ -127,10 +128,10 @@ public class OrderServiceImpl implements OrderService  {
         orderDO.setLastModifiedTime(now);
         orderDO.setRemark(createOrderReq.getRemark());
         orderDO.setCancelReason(createOrderReq.getCancelReason());
-        // 创建订单
+        // todo 4. 前面都成功了，创建订单，设置可见；否则回滚前面的动作。
         boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
         Preconditions.checkArgument(ok, "创建订单失败");
-        // todo 改成异步，重试直到成功
+        // todo 5. 改成异步，通过binlog，重试直到成功
         elasticSearchOperation.createDocument(EsIndexConstants.ORDER_INFO_INDEX, orderDO);
         hbaseService.putDataToHBase(orderDO);
         return String.valueOf(orderDO.getOrderNo());
@@ -157,6 +158,7 @@ public class OrderServiceImpl implements OrderService  {
         List<OrderDO> list = orderDOMapper.selectByExample(orderDOExample);
         Optional<OrderDO> orderDOOptional = list.stream().findFirst();
         if (orderDOOptional.isPresent()) {
+            // todo hbase没法根据orderNo查询到，必须传递create_time，有点问题
             OrderDO orderDO = hbaseService.query(String.valueOf(orderDOOptional.get().getUid()), orderDOOptional.get().getCreateTime(), orderNo);
             log.info("hbase query order {}", orderDO);
         }
@@ -182,6 +184,7 @@ public class OrderServiceImpl implements OrderService  {
         OrderDOExample.Criteria criteria2 = updateExample.or();
         criteria2.andOrderNoEqualTo(Long.parseLong(orderNo));
         int ret = orderDOMapper.updateByExampleSelective(updated, updateExample);
+        // todo 更新hbase
         return ret == 1 && updateEsOrderStatus(orderNo);
     }
 
