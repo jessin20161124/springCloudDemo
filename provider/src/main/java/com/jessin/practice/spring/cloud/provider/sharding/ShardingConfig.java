@@ -47,7 +47,10 @@ public class ShardingConfig implements EnvironmentAware {
     private final ShardingProperties shardingProperties;
 
     /**
-     * 配置一个sharding 数据源
+     * 配置一个sharding 数据源，底层有多个实际的数据源，
+     * 在mybatis datasource.getConnection()及prepareStatement()阶段，会根据sql上的逻辑表，根据映射规则，例如order_no % 32，找到真正的数据源、数据库实例、数据库、数据库表
+     * 替换为真正的sql
+     *
      * Get sharding data source bean.
      *
      * @return data source bean
@@ -58,6 +61,10 @@ public class ShardingConfig implements EnvironmentAware {
         return ShardingDataSourceFactory.createDataSource(getLogicDataSource(), new ShardingRuleConfigurationYamlSwapper().swap(shardingProperties.getSharding()), shardingProperties.getProps());
     }
 
+    /**
+     * 返回sharding规则表里，每个ds0-ds31实际的数据数据库实例和实际的数据库
+     * @return
+     */
     private Map<String, DataSource> getLogicDataSource() {
         return shardingProperties.getLogicDataSource().entrySet().stream().peek(entry -> {
             Preconditions.checkArgument(instanceDataSourceMap.containsKey(entry.getValue().getInstance()), "实例数据源不存在: " + entry);
@@ -76,6 +83,10 @@ public class ShardingConfig implements EnvironmentAware {
         return new ShardingTransactionTypeScanner();
     }
 
+    /**
+     * todo 启动阶段，就构建了每个数据库实例的数据源了
+     * @param environment
+     */
     @Override
     public final void setEnvironment(final Environment environment) {
         String prefix = "spring.shardingsphereplus.datasource.";

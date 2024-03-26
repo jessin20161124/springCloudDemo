@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * todo error handler使用
+ * todo rocketmq使用和对比
  */
 @Service
 @Slf4j
@@ -44,6 +45,7 @@ public class KafkaConsumer {
             log.info("record key: {}, record partition: {} record value: {}" ,
                     record.key(), record.partition(), record.value());
         });
+        // todo 成功才ack
         ack.acknowledge();
     }
 }

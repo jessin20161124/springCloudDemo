@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * todo 前端流量和业务后端的流量都是通过这里
  * todo es/redis/db等操作下层到infrastructure这一层，并提供通用接口，
  * todo 同时提供防腐层（依赖隔离，DTO/BO/DO隔离，上层依赖下层(controller->service->data)->api -> common，下层不能依赖上层data->service->controller，给出依赖关系图谱），定义通用的maven插件模版，抽取接口
-        拆分子pom，天然隔离，无法乱写代码
+        拆分子pom，天然隔离，无法乱写代码，拆分api/application/domain/infrastructure
       controller不要有太重的业务逻辑，进行组装即可
    todo 请求日志参数、结果和耗时打印，添加到common包
  todo 使用jenkins部署？

@@ -38,6 +38,7 @@ spring:
   shardingsphereplus:
     # todo 这里假设有两个实例数据源，实例维度，跟db没有关系
 
+    # todo 抽取到表里，而不是写死在配置文件中
     datasource:
       instance0:
         driver-class-name: com.mysql.cj.jdbc.Driver
