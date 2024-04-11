@@ -184,6 +184,7 @@ spring:
           database-strategy:
             inline:
               # 必须是double.valueOf，再int，内部计算得到的貌似是浮点数
+              # todo 能否使用自定义算法，使用一致性哈希？
               algorithm-expression: ds$->{Double.valueOf(order_no % 1024 / 32).intValue()}
               sharding-column: order_no
           table-strategy:
