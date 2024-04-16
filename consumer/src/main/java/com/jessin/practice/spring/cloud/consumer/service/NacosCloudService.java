@@ -3,7 +3,9 @@ package com.jessin.practice.spring.cloud.consumer.service;
 import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.alibaba.cloud.nacos.NacosConfigProperties;
 import com.alibaba.nacos.api.config.listener.Listener;
+
 import java.util.concurrent.Executor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
  * aa @Value 的方式dataId默认拉取的配置文件名为spring.application.name.{file.extension}，或者默认有共同前缀的spring.application.name，从而拉取多个配置文件
  * 所以spring cloud是一套微服务解决方案，依赖非常多，很多都封装好了，需要大家去适配它，而不是自己去做，考虑通用性和个性化，有时就不太灵活
  * 而spring boot是自动化配置而已，简化配置，更方便使用，但是功能还是和原生的一样
- *
+ * <p>
  * spring cloud貌似没有提供configListener的解决方案？todo 还是说监听refresh event?
  * 最好不要同时使用spring cloud和spring boot配置nacos，这里会配置两次连接，而且会有类冲突
  *

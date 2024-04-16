@@ -13,7 +13,8 @@ import com.jessin.practice.spring.cloud.common.PageResult;
 import com.jessin.practice.spring.cloud.provider.bo.OrderBO;
 import com.jessin.practice.spring.cloud.provider.bo.OrderStatisticBO;
 import com.jessin.practice.spring.cloud.provider.converter.OrderTransformer;
-import com.jessin.practice.spring.cloud.provider.service.OrderService;
+import com.jessin.practice.spring.cloud.provider.service.OrderOperationService;
+import com.jessin.practice.spring.cloud.provider.service.OrderQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderController {
     @Resource
-    private OrderService orderService;
+    private OrderQueryService orderQueryService;
+
+    @Resource
+    private OrderOperationService orderOperationService;
 
     /**
      * 返回值最好要复杂数据结构，以遍后续扩展
@@ -51,7 +55,7 @@ public class OrderController {
     @PostMapping("/createOrder")
     public HttpResult<CreateOrderResp> createOrder(@Validated @RequestBody CreateOrderReq createOrderReq) {
         // todo 抽取聚合层或者领域服务层，这两个有什么区别？聚合层是多个领域服务的聚合，通过聚合根进行访问？注意，未必有领域层
-        String orderNo = orderService.createOrder(createOrderReq);
+        String orderNo = orderOperationService.createOrder(createOrderReq);
         log.info("插入订单：{}，结果为：{}", createOrderReq, orderNo);
         CreateOrderResp createOrderResp = new CreateOrderResp();
         createOrderResp.setOrderNo(orderNo);
@@ -67,13 +71,13 @@ public class OrderController {
     @PostMapping("/queryOrder")
     public HttpResult<OrderDTO> queryOrder(@RequestBody OrderQueryReq orderQueryReq) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryReq);
-        Optional<OrderBO> orderBOOptional = orderService.selectOrder(orderQueryReq.getOrderNo());
+        Optional<OrderBO> orderBOOptional = orderQueryService.selectOrder(orderQueryReq.getOrderNo());
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryReq, orderBOOptional);
         return HttpResult.success(orderBOOptional.map(OrderTransformer::convert).orElse(null));
     }
 
     /**
-     curl -X POST -H "content-type: application/json;charset=utf-8"  "http://localhost:9999/cancelOrder?orderNo=7102593396078835370"
+     curl -X POST -H "content-type: application/json;charset=utf-8"  "http://localhost:9999/cancelOrder?orderNo=7185545518895351380"
      * 注意，注解均需要再写一遍
      * @param orderNo
      * @return
@@ -81,7 +85,7 @@ public class OrderController {
     @PostMapping("/cancelOrder")
     public HttpResult<Boolean> cancelOrder(@RequestParam String orderNo) {
         log.info("provider 实现，cancelOrder is {}", orderNo);
-        boolean result = orderService.cancelOrder(orderNo);
+        boolean result = orderOperationService.cancelOrder(orderNo);
         log.debug("取消订单 {} 结果为 {}", orderNo, result);
         return HttpResult.success(result);
     }
@@ -105,9 +109,9 @@ public class OrderController {
     public HttpResult<PageResult<List<OrderDTO>>> searchOrder(@Valid @RequestBody OrderQueryReq orderQueryReq) {
         log.info("provider 实现，orderQueryReq is {}", orderQueryReq);
         // 由这层转换入参和出参是合理的
-        List<OrderBO> orderBOList = orderService.searchOrder(orderQueryReq);
+        List<OrderBO> orderBOList = orderQueryService.searchOrder(orderQueryReq);
         // 条数，其实本身已经有了
-        long total = orderService.countOrder(orderQueryReq);
+        long total = orderQueryService.countOrder(orderQueryReq);
 
         List<OrderDTO> orderDTOList = orderBOList.stream().map(OrderTransformer::convert).collect(Collectors.toList());
 
@@ -128,7 +132,7 @@ public class OrderController {
         log.info("provider 实现，orderQueryReq is {}", orderQueryReq);
         // todo uid必填
         // 由这层转换入参和出参是合理的
-        List<OrderBO> orderBOList = orderService.searchArchiveOrder(orderQueryReq.getUid(), orderQueryReq.getCreateTimeBegin(), orderQueryReq.getCreateTimeEnd());
+        List<OrderBO> orderBOList = orderQueryService.searchArchiveOrder(orderQueryReq.getUid(), orderQueryReq.getCreateTimeBegin(), orderQueryReq.getCreateTimeEnd());
 
         List<OrderDTO> orderDTOList = orderBOList.stream().map(OrderTransformer::convert).collect(Collectors.toList());
 
@@ -157,7 +161,7 @@ public class OrderController {
     @PostMapping("/scrollOrder")
     public HttpResult<ScrollResult<List<OrderDTO>>> scrollOrder(@Valid @RequestBody OrderQueryReq orderQueryReq) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryReq);
-        ScrollResult<List<OrderBO>> orderBOList = orderService.scrollOrder(orderQueryReq);
+        ScrollResult<List<OrderBO>> orderBOList = orderQueryService.scrollOrder(orderQueryReq);
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryReq, orderBOList);
 
         List<OrderDTO> list = orderBOList.getData().stream().map(OrderTransformer::convert).collect(Collectors.toList());
@@ -177,7 +181,7 @@ public class OrderController {
     @PostMapping("/statisticOrder")
     public HttpResult<List<OrderStatisticDTO>> statisticOrder(@Valid @RequestBody OrderQueryReq orderQueryReq) {
         log.info("provider 实现，orderQueryCondition is {}", orderQueryReq);
-        List<OrderStatisticBO> orderBOList = orderService.statisticOrder(orderQueryReq);
+        List<OrderStatisticBO> orderBOList = orderQueryService.statisticOrder(orderQueryReq);
         log.debug("查询orderQueryCondition {} 对应订单 {}", orderQueryReq, orderBOList);
         return HttpResult.success(ListUtils.transformBeanList(orderBOList, OrderStatisticDTO.class));
     }

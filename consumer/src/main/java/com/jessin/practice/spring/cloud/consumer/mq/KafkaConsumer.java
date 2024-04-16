@@ -1,4 +1,4 @@
-package com.jessin.practice.spring.cloud.consumer.controller;
+package com.jessin.practice.spring.cloud.consumer.mq;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -37,7 +37,7 @@ public class KafkaConsumer {
      * 手动ack
      * @param ack
      */
-    @KafkaListener(id = "webGroup", topics = "topic_input_2")
+//    @KafkaListener(id = "webGroup", topics = "topic_input_2")
     public void batchListen(List<ConsumerRecord<String, String>> recordList, Acknowledgment ack) {
         log.info("record list : {}", recordList.size());
         // 如果要改为并发消费，需要按照partition再聚合下

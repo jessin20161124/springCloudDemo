@@ -1,7 +1,9 @@
 package com.jessin.practice.spring.cloud.provider.converter;
 
+import com.jessin.practice.spring.cloud.api.dto.OrderMsg;
 import com.jessin.practice.spring.cloud.api.dto.resp.OrderDTO;
 import com.jessin.practice.spring.cloud.provider.bo.OrderBO;
+import com.jessin.practice.spring.cloud.provider.entity.OrderDO;
 import lombok.experimental.UtilityClass;
 import org.springframework.beans.BeanUtils;
 
@@ -22,4 +24,25 @@ public class OrderTransformer {
         orderDTO.setStoreName("men");
         return orderDTO;
     }
+
+    public static OrderMsg convert(OrderDO orderDO) {
+        // 这种代码，更适合放在聚合层里，而且需要支持按需查询，不是所有字段都需要
+        OrderMsg orderMsg = new OrderMsg();
+        // 名字相同类型不一样，不会自动copy
+        BeanUtils.copyProperties(orderDO, orderMsg);
+        orderMsg.setOrderNo(String.valueOf(orderDO.getOrderNo()));
+        // DTO会多一些额外的字段
+        return orderMsg;
+    }
+
+    public static OrderDO convert(OrderMsg orderMsg) {
+        // 这种代码，更适合放在聚合层里，而且需要支持按需查询，不是所有字段都需要
+        OrderDO orderDO = new OrderDO();
+        // 名字相同类型不一样，不会自动copy
+        BeanUtils.copyProperties(orderMsg, orderDO);
+        orderDO.setOrderNo(Long.valueOf(orderMsg.getOrderNo()));
+        // DTO会多一些额外的字段
+        return orderDO;
+    }
+
 }

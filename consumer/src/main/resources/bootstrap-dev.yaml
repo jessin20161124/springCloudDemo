@@ -34,7 +34,6 @@ spring:
       concurrency: 2
       # 支持批量消费
       type: batch
-
 # 全局，可以到服务级别，不能到方法级别
 ribbon:
   #每台重试一次，不包括第一次
@@ -48,3 +47,24 @@ ribbon:
   retryableStatusCodes: 404,405,406
   #所有异常都可以重试，否则只有get请求能重试
   OkToRetryOnAllOperations: true
+
+rocketmq:
+  # 类似于zk的一个地址
+  name-server: 101.43.195.208:9876
+  # 生产者配置
+  producer:
+    isOnOff: on
+    # 发送同一类消息的设置为同一个group，保证唯一
+    group: user-consumer-group
+    groupName: user-consumer-group
+
+    group1: order-consumer-group
+    groupName1: order-consumer-group
+    # 服务地址
+    namesrvAddr: 101.43.195.208:9876
+    # 消息最大长度 默认1024*4(4M)
+    maxMessageSize: 4096
+    # 发送消息超时时间,默认3000
+    sendMsgTimeout: 3000
+    # 发送消息失败重试次数，默认2
+    retryTimesWhenSendFailed: 2

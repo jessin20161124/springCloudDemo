@@ -4,8 +4,8 @@ spring:
       config:
         server-addr: 101.43.195.208:8848
         file-extension: properties
-#      discovery:
-#        server-addr: 101.43.195.208:8848
+    #      discovery:
+    #        server-addr: 101.43.195.208:8848
     consul:
       discovery:
         #注册到 Consul 的服务名称，后期客户端会根据这个名称来进行服务调用
@@ -31,6 +31,7 @@ spring:
       concurrency: 2
       # 支持批量消费
       type: batch
+
   # todo 原生shardingsphere  springboot starter，对于分太多库，会有toomany connection ，这里不使用
   # todo 原生是数据库维度的，实例ip相同，会重复建立连接池，导致mysql服务端抛出too many connections异常
   shardingsphere:
@@ -215,7 +216,28 @@ spring:
       database: test
       password: ${mongoPassword}
 
+rocketmq:
+  name-server: 101.43.195.208:9876
+  # 生产者配置
+  producer:
+    isOnOff: on
+    # 发送同一类消息的设置为同一个group，保证唯一
+    group: user-provider-group
+    groupName: user-provider-group
+
+    group1: order-provider-group
+    groupName1: order-provider-group
+    # 服务地址
+    namesrvAddr: 101.43.195.208:9876
+    # 消息最大长度 默认1024*4(4M)
+    maxMessageSize: 4096
+    # 发送消息超时时间,默认3000
+    sendMsgTimeout: 3000
+    # 发送消息失败重试次数，默认2
+    retryTimesWhenSendFailed: 2
+
 redisson:
+  enabled: false
   host: 101.43.195.208:6379
   password: ${redissonPassword}
 
@@ -233,6 +255,14 @@ hbase:
   znode-parent: /hbase
 
 logging:
+  file.max-history: 10
+  file.max-size: 1GB
+#  file: "/Users/jessin/Documents/logs/bps.log"
+  pattern:
+    #日志格式，分别是文件的日志格式和控制台的日志格式
+    file: "%d{ISO8601} [%-5level] [%thread] |%L|%-40.40logger{36}|QTraceID[%X{qtraceid}]|---%msg%n"
+    console: "%d{ISO8601} [%-5level] [%thread] |%L|%-40.40logger{36}|QTraceID[%X{qtraceid}]|---%msg%n"
+
   level:
     root: info
     # 打印es curl请求日志，具体可看org.elasticsearch.client.RequestLogger

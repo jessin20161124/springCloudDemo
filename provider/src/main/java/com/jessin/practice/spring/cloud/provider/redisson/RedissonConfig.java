@@ -3,6 +3,7 @@ package com.jessin.practice.spring.cloud.provider.redisson;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import java.io.IOException;
  */
 @Configuration
 @EnableConfigurationProperties(RedissonProperties.class)
+@ConditionalOnProperty(prefix = "redisson", value = "enabled", havingValue = "true")
 public class RedissonConfig {
 
     @Resource

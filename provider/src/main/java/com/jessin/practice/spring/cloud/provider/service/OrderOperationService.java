@@ -10,21 +10,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderService {
+/**
+ * CQRS，读写分离，使用各自的数据模型
+ */
+public interface OrderOperationService {
 
     String createOrder(CreateOrderReq createOrderReq);
 
-    Optional<OrderBO> selectOrder(String orderNo);
-
     boolean cancelOrder(String orderNo);
-
-    List<OrderBO> searchOrder(OrderQueryReq orderQueryCondition);
-
-    List<OrderBO> searchArchiveOrder(String uid, Date createTimeBegin, Date createTimeEnd);
-
-    ScrollResult<List<OrderBO>> scrollOrder(OrderQueryReq orderQueryCondition);
-
-    long countOrder(OrderQueryReq orderQueryCondition);
-
-    List<OrderStatisticBO> statisticOrder(OrderQueryReq orderQueryCondition);
 }

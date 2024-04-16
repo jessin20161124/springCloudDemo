@@ -1,7 +1,5 @@
 package com.jessin.practice.spring.cloud.provider.service.impl;
 
-import com.google.common.base.Preconditions;
-import com.jessin.practice.spring.cloud.api.dto.req.CreateOrderReq;
 import com.jessin.practice.spring.cloud.api.dto.req.OrderQueryReq;
 import com.jessin.practice.spring.cloud.api.dto.resp.ScrollResult;
 import com.jessin.practice.spring.cloud.common.IdGenerator;
@@ -15,9 +13,9 @@ import com.jessin.practice.spring.cloud.provider.entity.OrderDOExample;
 import com.jessin.practice.spring.cloud.provider.es.ElasticSearchOperation;
 import com.jessin.practice.spring.cloud.provider.hbase.HbaseService;
 import com.jessin.practice.spring.cloud.provider.mapper.OrderDOMapper;
-import com.jessin.practice.spring.cloud.provider.service.OrderService;
+import com.jessin.practice.spring.cloud.provider.mq.RocketMqHelper;
+import com.jessin.practice.spring.cloud.provider.service.OrderQueryService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.*;
@@ -34,7 +32,6 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -85,7 +82,7 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-public class OrderServiceImpl implements OrderService  {
+public class OrderQueryServiceImpl implements OrderQueryService {
 
     @Resource
     private OrderDOMapper orderDOMapper;
@@ -95,55 +92,6 @@ public class OrderServiceImpl implements OrderService  {
 
     @Resource
     private ElasticSearchOperation elasticSearchOperation;
-
-    // 用随机数，避免冲突，雪花算法最后12bit在并发低的情况下是0
-    private final static IdGenerator idGenerator = new RandomIdGenerator();
-
-    /**
-     * 这里传递req是否合适，是否传递BO？
-     * todo 需要保证用户粒度幂等
-     * @param createOrderReq
-     * @return
-     */
-    @Transactional
-    public String createOrder(CreateOrderReq createOrderReq) {
-        OrderDO orderDO = new OrderDO();
-        orderDO.setStoreId(createOrderReq.getStoreId());
-        // todo 1. 从上下文拿到登陆uid信息，参数校验
-        orderDO.setUid(345L);
-        // todo tcc实现分布式事务，2. 先createOrder，设置不可见
-        // todo 3. 风控校验、限购校验，计算总金额，需要支付的金额，运费，和传递回来的金额比较。冻结商品库存/优惠券/积分等
-        orderDO.setTotalAmount(BigDecimal.valueOf(5.2));
-        orderDO.setPayAmount(BigDecimal.valueOf(4.2));
-        // todo orderNo中最后10位，取自userid，保证根据userId也能找到具体的数据源，最常见的也是最实时的查询方式，其他查询方式通过es查询
-        long orderNo = idGenerator.nextId();
-        log.info("orderNo: {}", orderNo);
-        orderDO.setOrderNo(orderNo);
-        // todo 保存商品快照，清空购物车
-        // todo 枚举，待支付状态
-        orderDO.setOrderStatus((byte)0);
-        Date now = getNow();
-        // 时间在代码中生成，更加灵活
-        orderDO.setCreateTime(now);
-        orderDO.setLastModifiedTime(now);
-        orderDO.setRemark(createOrderReq.getRemark());
-        orderDO.setCancelReason(createOrderReq.getCancelReason());
-        // todo 4. 前面都成功了，创建订单，设置可见；否则回滚前面的动作。
-        boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
-        Preconditions.checkArgument(ok, "创建订单失败");
-        // todo 5. 改成异步，通过binlog，重试直到成功
-        elasticSearchOperation.createDocument(EsIndexConstants.ORDER_INFO_INDEX, orderDO);
-        hbaseService.putDataToHBase(orderDO);
-        return String.valueOf(orderDO.getOrderNo());
-    }
-
-    /**
-     * 去除毫秒，存到db里不会存毫秒，可能会进位，导致跟内存里的不一致
-     * @return
-     */
-    private Date getNow() {
-        return new Date(System.currentTimeMillis() / 1000 * 1000);
-    }
 
     /**
      * 这种mapper比较通用，需要判断空，代码层面拼接sql，变化的是代码层面
@@ -167,40 +115,6 @@ public class OrderServiceImpl implements OrderService  {
             BeanUtils.copyProperties(orderDO, orderBO);
             return orderBO;
         });
-    }
-
-    public boolean cancelOrder(String orderNo) {
-        OrderDOExample orderDOExample = new OrderDOExample();
-        OrderDOExample.Criteria criteria = orderDOExample.or();
-        criteria.andOrderNoEqualTo(Long.parseLong(orderNo));
-        List<OrderDO> list = orderDOMapper.selectByExample(orderDOExample);
-        Preconditions.checkArgument(CollectionUtils.isNotEmpty(list), "db订单不存在: " + orderNo);
-        Preconditions.checkArgument(list.get(0).getOrderStatus() == 0, "es订单状态非法: " + orderNo);
-
-        OrderDO updated = new OrderDO();
-        // db取消状态，这里可能有并发问题，需要加乐观锁或者悲观锁
-        updated.setOrderStatus((byte)1);
-        OrderDOExample updateExample = new OrderDOExample();
-        OrderDOExample.Criteria criteria2 = updateExample.or();
-        criteria2.andOrderNoEqualTo(Long.parseLong(orderNo));
-        int ret = orderDOMapper.updateByExampleSelective(updated, updateExample);
-        // todo 更新hbase
-        return ret == 1 && updateEsOrderStatus(orderNo);
-    }
-
-    /**
-     * 异步更新，重试。这里使用了es乐观锁，版本概念更新
-     * @param orderNo
-     * @return
-     */
-    private boolean updateEsOrderStatus(String orderNo) {
-        OrderDO esOrder = elasticSearchOperation.getDocument(EsIndexConstants.ORDER_INFO_INDEX, orderNo, OrderDO.class);
-
-        Preconditions.checkNotNull(esOrder, "es订单不存在: " + orderNo);
-        Preconditions.checkArgument(esOrder.getOrderStatus() == 0, "es订单状态非法: " + orderNo);
-        esOrder.setOrderStatus((byte)1);
-        boolean ret = elasticSearchOperation.updateDocument(EsIndexConstants.ORDER_INFO_INDEX, esOrder);
-        return ret;
     }
 
     /**
