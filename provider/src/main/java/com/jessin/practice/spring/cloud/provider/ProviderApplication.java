@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Bean;
  * flatten可以对发布方的pom进行精简和变量替换
  */
 @SpringBootApplication
-@MapperScan(basePackages = "com.jessin.practice.spring.cloud.provider.mapper")
+@MapperScan(basePackages = "com.jessin.practice.spring.cloud.provider.infrastructure.mapper")
 public class ProviderApplication {
 
 	public static void main(String[] args) {

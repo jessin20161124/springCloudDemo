@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jessin.practice.spring.cloud.provider.mapper.OrderDOMapper">
-  <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.provider.entity.OrderDO">
+<mapper namespace="com.jessin.practice.spring.cloud.provider.infrastructure.mapper.OrderDOMapper">
+  <resultMap id="BaseResultMap" type="com.jessin.practice.spring.cloud.provider.domain.entity.OrderDO">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="order_no" jdbcType="BIGINT" property="orderNo" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
@@ -76,7 +76,7 @@
     id, order_no, remark, cancel_reason, `uid`, store_id, total_amount, pay_amount, order_status, 
     create_time, last_modified_time
   </sql>
-  <select id="selectByExample" parameterType="com.jessin.practice.spring.cloud.provider.entity.OrderDOExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.jessin.practice.spring.cloud.provider.domain.entity.OrderDOExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -95,7 +95,7 @@
     delete from tb_order
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.jessin.practice.spring.cloud.provider.entity.OrderDO">
+  <insert id="insert" parameterType="com.jessin.practice.spring.cloud.provider.domain.entity.OrderDO">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -108,7 +108,7 @@
       #{payAmount,jdbcType=DECIMAL}, #{orderStatus,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
       #{lastModifiedTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.provider.entity.OrderDO">
+  <insert id="insertSelective" parameterType="com.jessin.practice.spring.cloud.provider.domain.entity.OrderDO">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
