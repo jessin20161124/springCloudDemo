@@ -220,21 +220,19 @@ rocketmq:
   name-server: 101.43.195.208:9876
   # 生产者配置
   producer:
-    isOnOff: on
     # 发送同一类消息的设置为同一个group，保证唯一
-    group: user-provider-group
-    groupName: user-provider-group
-
-    group1: order-provider-group
-    groupName1: order-provider-group
-    # 服务地址
-    namesrvAddr: 101.43.195.208:9876
+    group: provider-group
     # 消息最大长度 默认1024*4(4M)
     maxMessageSize: 4096
-    # 发送消息超时时间,默认3000
-    sendMsgTimeout: 3000
     # 发送消息失败重试次数，默认2
     retryTimesWhenSendFailed: 2
+    # 发送消息超时时间,默认3000
+    send-message-timeout: 30000
+  consumer:
+    pull-batch-size: 30
+    userGroup: user-self-consume-group
+    orderGroup: order-self-consume-group
+
 
 redisson:
   enabled: false

@@ -107,7 +107,7 @@ public class OrderOperationServiceImpl implements OrderOperationService {
         orderDO.setLastModifiedTime(now);
         orderDO.setRemark(createOrderReq.getRemark());
         orderDO.setCancelReason(createOrderReq.getCancelReason());
-        // todo 4. 前面都成功了，创建订单，设置可见；否则回滚前面的动作。
+        // todo 4. 前面都成功了，创建订单，设置可见；否则回滚前面的动作。两阶段还是saga?
         boolean ok = orderDOMapper.insertSelective(orderDO) == 1;
         Preconditions.checkArgument(ok, "创建订单失败");
 
@@ -150,6 +150,7 @@ public class OrderOperationServiceImpl implements OrderOperationService {
     }
 
     /**
+     * 虽然是事务后提交，但是还是有可能发送消息失败的情况，导致发送消息丢失
      * https://cloud.tencent.com/developer/article/1497715
      * @param operationTypeEnum
      * @param orderDO
@@ -163,6 +164,8 @@ public class OrderOperationServiceImpl implements OrderOperationService {
                 // 理论上，服务器和中间件，必须在同一个局域网中，否则延迟会很高
                 OrderMsg orderMsg = OrderTransformer.convert(orderDO);
                 orderMsg.setOperationType(operationTypeEnum.getCode());
+                // 同步发送，会卡住，kafka其实也是同步发送
+                // todo 每条消息应该有唯一的消息id，方便下游去重，幂等，todo 指定key
                 rocketMqHelper.syncSendOrderly("ORDER_ADD", MessageBuilder.withPayload(orderMsg).build(),
                         orderMsg.getOrderNo(), 30000);
             }

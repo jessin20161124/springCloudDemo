@@ -110,6 +110,9 @@ public class UserServiceFeignClientImpl {
     public HttpResult<UserDTO> insertUser(@Valid @RequestBody UserDTO userDTO) {
         boolean result = userService.insert(userDTO);
         log.info("插入用户：{}，结果为：{}", userDTO, result);
+        if (!result) {
+            return HttpResult.fail("插入失败");
+        }
         return HttpResult.success(userDTO);
     }
 

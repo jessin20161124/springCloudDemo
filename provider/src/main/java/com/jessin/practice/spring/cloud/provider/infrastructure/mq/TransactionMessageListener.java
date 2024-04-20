@@ -1,5 +1,6 @@
 package com.jessin.practice.spring.cloud.provider.infrastructure.mq;
 
+import com.jessin.practice.spring.cloud.provider.domain.constant.common;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
@@ -31,7 +32,7 @@ public class TransactionMessageListener implements RocketMQLocalTransactionListe
         // 1、获取事务ID
         String transactionId = null;
         try {
-            transactionId = message.getHeaders().get("__transactionId__").toString();
+            transactionId = message.getHeaders().get(common.TRANSACTION_ID).toString();
             log.info("执行本地事务 transactionId={}", transactionId);
             // 2、判断传入函数对象是否为空，如果为空代表没有要执行的业务直接抛弃消息
             if (o == null) {
@@ -51,7 +52,7 @@ public class TransactionMessageListener implements RocketMQLocalTransactionListe
             log.info("事务消息回滚，业务本地事务执行失败回滚事务消息 transactionId={}", transactionId);
             //返回ROLLBACK状态的消息会被丢弃
         } catch (Exception e) {
-            log.info("出现异常 返回ROLLBACK transactionId={}", transactionId);
+            log.error("出现异常 返回ROLLBACK transactionId={}, msg:{} ", transactionId, e.getMessage(), e);
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         return RocketMQLocalTransactionState.ROLLBACK;

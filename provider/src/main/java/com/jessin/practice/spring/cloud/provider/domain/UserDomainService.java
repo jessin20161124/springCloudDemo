@@ -26,18 +26,10 @@ public class UserDomainService {
 
     /**
      * 按理这里应该传递BO
-     * @param userDTO
+     * @param userDO
      * @return
      */
-    @Transactional
-    public boolean insert(UserDTO userDTO) {
-        UserDO userDO = new UserDO();
-        BeanUtils.copyProperties(userDTO, userDO);
-        // 不要使用数据库的自增id，这里自己生成一个，方便后续分库分表和迁移
-        userDO.setUserId(idGenerator.nextId());
-        // 时间在代码中生成，方便后续同步到其他模块，例如mongodb
-        userDO.setCreateTime(new Date());
-        userDO.setLastModifiedTime(new Date());
+    public boolean insert(UserDO userDO) {
         boolean dbRes = userMapper.insertSelective(userDO) == 1;
         if (!dbRes) {
             return false;

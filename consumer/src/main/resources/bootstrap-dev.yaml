@@ -52,19 +52,17 @@ rocketmq:
   # 类似于zk的一个地址
   name-server: 101.43.195.208:9876
   # 生产者配置
+  # 即使实际不需要producer，也需要配置下这个，否则调用超时没法配置
   producer:
-    isOnOff: on
     # 发送同一类消息的设置为同一个group，保证唯一
-    group: user-consumer-group
-    groupName: user-consumer-group
-
-    group1: order-consumer-group
-    groupName1: order-consumer-group
-    # 服务地址
-    namesrvAddr: 101.43.195.208:9876
+    group: consumer-group
     # 消息最大长度 默认1024*4(4M)
     maxMessageSize: 4096
-    # 发送消息超时时间,默认3000
-    sendMsgTimeout: 3000
     # 发送消息失败重试次数，默认2
     retryTimesWhenSendFailed: 2
+    # 发送消息超时时间,默认3000
+    send-message-timeout: 30000
+  consumer:
+    userGroup: user-consumer-group
+    orderGroup: order-consumer-group
+

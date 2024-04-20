@@ -14,6 +14,7 @@ import com.jessin.practice.spring.cloud.common.ListUtils;
 import com.jessin.practice.spring.cloud.common.RandomIdGenerator;
 import com.jessin.practice.spring.cloud.provider.domain.UserDomainService;
 import com.jessin.practice.spring.cloud.provider.domain.bo.UserQueryCondition;
+import com.jessin.practice.spring.cloud.provider.domain.constant.common;
 import com.jessin.practice.spring.cloud.provider.domain.converter.OrderTransformer;
 import com.jessin.practice.spring.cloud.provider.domain.entity.OrderDO;
 import com.jessin.practice.spring.cloud.provider.domain.entity.UserDO;
@@ -53,6 +54,8 @@ import java.util.function.Function;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    // 用随机数，避免冲突，雪花算法最后12bit在并发低的情况下是0
+    private final static IdGenerator idGenerator = new RandomIdGenerator();
 
     @Resource
     private UserMapper userMapper;
@@ -147,21 +150,32 @@ public class UserServiceImpl implements UserService {
      */
     public boolean insert(UserDTO userDTO) {
 
+        UserDO userDO = new UserDO();
+        BeanUtils.copyProperties(userDTO, userDO);
+        // 不要使用数据库的自增id，这里自己生成一个，方便后续分库分表和迁移，保证全局不冲突
+        userDO.setUserId(idGenerator.nextId());
+        // 时间在代码中生成，方便后续同步到其他模块，例如mongodb
+        userDO.setCreateTime(new Date());
+        userDO.setLastModifiedTime(new Date());
+
+        // 这里不会有数据库生成的自增id，因为还没有执行
         UserMsg userMsg = new UserMsg();
         // 构建事务消息第三个参数，这里以Function函数为例 可以解决事务消息id回传问题，也可以自定义一个事务id写入消息体中
-        BeanUtils.copyProperties(userDTO, userMsg);
+        BeanUtils.copyProperties(userDO, userMsg);
+
         Function function = new Function<String,Boolean>(){
             @Override
             public Boolean apply(String transactionId) {
-                boolean execute = userDomainService.insert(userDTO);
+                boolean execute = userDomainService.insert(userDO);
                 return execute;
             }
         };
 
         // todo 事务消息不支持有序？
-        // 发送prepare消息后，执行本地事务listener，最后再发送这条消息commit
+        // 发送prepare消息（暂时保存在临时事务topic=RMQ_SYS_TRANS_HALF_TOPIC中，此时不能消费），执行本地事务listener，最后再发送这条消息commit（存到真正的topic中，可以消费到）
         // 发送事务消息:采用的是sendMessageInTransaction方法，返回结果为TransactionSendResult对象，该对象中包含了事务发送的状态、本地事务执行的状态等
-        TransactionSendResult result = rocketMqHelper.sendMessageInTransaction("USER_ADD", MessageBuilder.withPayload(userMsg).build(), function);
+        TransactionSendResult result = rocketMqHelper.sendMessageInTransaction("USER_ADD", MessageBuilder.withPayload(userMsg)
+                .setHeader(common.TRANSACTION_ID, idGenerator.nextId()).build(), function);
         // 事务消息提交状态
         String localTransactionState = result.getLocalTransactionState().name();
         // 如果消息被回滚代表业务执行异常本地事务提交失败
@@ -176,7 +190,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 这里按理应该使用BO，但是如果没有太复杂的结构，可以直接使用DTO
-     * todo 注意防止数据库成功了，mongo失败了的情况
+     * todo 注意防止数据库成功了，mongo失败了的情况；这里还可能发生数据库失败了，mongo成功了
      * @param userUpdateReq
      * @return
      */

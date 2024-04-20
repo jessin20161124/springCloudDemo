@@ -9,7 +9,15 @@ public class UserMsg {
 
     private int operationType;
 
+    /**
+     * mongo id指定不生效，这里使用的是id，如果赋值了的话。应该是命名冲突了
+     */
     private Long id;
+
+    /**
+     * 指定唯一键
+     */
+    private Long userId;
 
     private String name;
 

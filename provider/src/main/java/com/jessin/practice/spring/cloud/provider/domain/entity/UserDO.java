@@ -17,7 +17,7 @@ public class UserDO {
     private Long id;
 
     /**
-     * 指定唯一键
+     * 指定唯一键，作为_id
      */
     @Id
     private Long userId;

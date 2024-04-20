@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.producer.groupName1}", topic = "ORDER_ADD", consumeMode = ConsumeMode.ORDERLY)
+@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.orderGroup}", topic = "ORDER_ADD", consumeMode = ConsumeMode.ORDERLY)
 public class OrderMqListener implements RocketMQListener<OrderMsg> {
 
     @Resource
@@ -29,9 +29,9 @@ public class OrderMqListener implements RocketMQListener<OrderMsg> {
 
     // 写入es/hbase，需要保证同一订单有序
     @Override
-    public void onMessage(OrderMsg order) {
-        log.info("接收到消息，开始消费..OrderType:{}, orderNo:{}", OrderOperationTypeEnum.codeOf(order.getOperationType()), order.getOrderNo());
-        OrderDO orderDO = OrderTransformer.convert(order);
+    public void onMessage(OrderMsg orderMsg) {
+        log.info("接收到消息，开始消费..OrderType:{}, orderNo:{}", OrderOperationTypeEnum.codeOf(orderMsg.getOperationType()), orderMsg.getOrderNo());
+        OrderDO orderDO = OrderTransformer.convert(orderMsg);
 
         // todo 通过binlog构建索引
         // 异步，重试直到成功
@@ -49,7 +49,7 @@ public class OrderMqListener implements RocketMQListener<OrderMsg> {
 
     /**
      * 异步更新，重试。这里使用了es乐观锁，版本概念更新
-     *
+     * todo @Retryable()
      * @param orderNo
      * @return
      */

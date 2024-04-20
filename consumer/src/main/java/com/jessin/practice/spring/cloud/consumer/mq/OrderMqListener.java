@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RocketMQMessageListener(consumerGroup = "${rocketmq.producer.groupName1}", topic = "ORDER_ADD", consumeMode = ConsumeMode.ORDERLY)
+@RocketMQMessageListener(consumerGroup = "${rocketmq.consumer.orderGroup}", topic = "ORDER_ADD", consumeMode = ConsumeMode.ORDERLY)
 // 广播模式，只能是并发执行，所有的消费者都会收到
 //@RocketMQMessageListener(consumerGroup = "${rocketmq.producer.groupName1}", topic = "ORDER_ADD", messageModel= MessageModel.BROADCASTING, consumeMode = ConsumeMode.CONCURRENTLY)
 public class OrderMqListener implements RocketMQListener<OrderMsg> {

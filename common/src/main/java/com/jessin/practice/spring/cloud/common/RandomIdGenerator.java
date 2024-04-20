@@ -22,6 +22,7 @@ public class RandomIdGenerator implements IdGenerator {
     @Override
     public long nextId() {
         long time = System.currentTimeMillis() & sequenceMask;
+        // 线程安全
         long seq = ThreadLocalRandom.current().nextLong(0, MAX_SEQ);
         return (time << SEQ_BIT) ^ seq;
     }
