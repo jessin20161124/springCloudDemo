@@ -31,7 +31,6 @@ public class UserMqListener implements RocketMQListener<MessageExt>, RocketMQPus
     @Override
     public void onMessage(MessageExt messageExt) {
         // todo 消息消费延迟，以及打印请求入口日志，调用下游日志
-        // todo tag消息过滤
         String body = new String(messageExt.getBody(), StandardCharsets.UTF_8);
 
         UserMsg userMsg = JsonUtils.read(body, UserMsg.class);

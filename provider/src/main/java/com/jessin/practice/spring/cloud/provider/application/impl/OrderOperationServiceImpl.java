@@ -166,7 +166,8 @@ public class OrderOperationServiceImpl implements OrderOperationService {
                 orderMsg.setOperationType(operationTypeEnum.getCode());
                 // 同步发送，会卡住，kafka其实也是同步发送
                 // todo 每条消息应该有唯一的消息id，方便下游去重，幂等，todo 指定key
-                rocketMqHelper.syncSendOrderly("ORDER_ADD", MessageBuilder.withPayload(orderMsg).build(),
+                // 这里使用tag
+                rocketMqHelper.syncSendOrderly("ORDER_ADD:" + operationTypeEnum.name(), MessageBuilder.withPayload(orderMsg).build(),
                         orderMsg.getOrderNo(), 30000);
             }
         });
@@ -184,7 +185,7 @@ public class OrderOperationServiceImpl implements OrderOperationService {
                 orderMsg.setOperationType(OrderOperationTypeEnum.TIMEOUT_CANCEL.getCode());
                 // 18个延迟级别，对应18个队列，这里放到队列4中
                 // 1s 5s 10s 30s 1min 2min 3min 4min 5min 6min 7min 8min 9min 10min 20min 30min 1h 2h
-                rocketMqHelper.syncSendDelay("ORDER_ADD", MessageBuilder.withPayload(orderMsg).build(), 30000, 5);
+                rocketMqHelper.syncSendDelay("ORDER_ADD:" + OrderOperationTypeEnum.TIMEOUT_CANCEL.name(), MessageBuilder.withPayload(orderMsg).build(), 30000, 5);
             }
         });
     }
